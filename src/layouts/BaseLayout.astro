@@ -204,6 +204,19 @@ const navLinks = [
       function raf(time: number) { lenisInstance.raf(time); requestAnimationFrame(raf); }
       requestAnimationFrame(raf);
     }
+    // Allow middle-mouse auto-scroll by pausing Lenis during auto-scroll
+    document.addEventListener('mousedown', (e: MouseEvent) => {
+      if (e.button === 1 && lenisInstance) {
+        lenisInstance.stop();
+        const resume = () => {
+          if (lenisInstance) lenisInstance.start();
+          document.removeEventListener('click', resume);
+          document.removeEventListener('mousedown', resume);
+        };
+        document.addEventListener('click', resume, { once: true });
+        document.addEventListener('mousedown', resume, { once: true });
+      }
+    });
   }
 
   // ── AUTO-PARALLAX ──

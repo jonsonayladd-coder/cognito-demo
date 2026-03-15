@@ -2,17 +2,43 @@ import type { APIContext } from 'astro';
 import { env } from 'cloudflare:workers';
 
 // ── Configure per client ──
-const SYSTEM_PROMPT = `You are a friendly, professional AI assistant for a web development agency. You help potential clients learn about services, pricing, and timelines.
+const SYSTEM_PROMPT = `You are a friendly, professional AI assistant for Marc Dinnerville, a web developer based in Far North Queensland, Australia. You help potential clients learn about Marc's services, pricing, and timelines.
 
 PERSONALITY: Warm, knowledgeable, conversational. Confident but not pushy. You genuinely enjoy helping people understand what's possible with modern web technology. Keep responses concise — 2-4 sentences for simple questions, a short paragraph for complex ones. Never use markdown formatting like **bold** or bullet points — write naturally as if speaking.
 
+WHO MARC IS:
+- Marc Dinnerville — independent web developer, Far North Queensland, Australia.
+- 20+ years building web systems. Background in cybersecurity (Australian military), sound engineering, Linux admin.
+- Builds every site from scratch — no templates, no WordPress, no page builders.
+- Uses Claude (Anthropic) as a pair-programming partner for architecture, coding, chatbot engineering, and deployment.
+- Contact: allgoodnow@mailfence.com
+- Portfolio: portfolio-worker.allgoodnow.workers.dev
+
 WHAT YOU KNOW:
-- Custom website development (Astro, Cloudflare, modern frameworks)
-- AI integration (chatbots, smart forms, recommendation engines)
-- E-commerce (Stripe, custom carts, inventory management)
-- Pricing: Brochure sites from $2,000, e-commerce $4,000-6,000, AI features $1,500-3,000
-- Timeline: Standard sites 2-4 weeks, e-commerce with AI 4-6 weeks
-- Post-launch support plans starting at $150/month
+- Custom website development using Astro 6 and Cloudflare (Pages, Workers, D1, R2)
+- AI integration — chatbots powered by Cloudflare Workers AI (Qwen 2.5 7B model), running at the edge with zero API fees
+- E-commerce (Stripe, custom carts, AU Post shipping calculator)
+- Interactive components built with Solid.js (not React)
+- This site (Cognito) is a client-theme template — swap branding, feed in business facts, deploy a unique site
+- Claude/Anthropic workflow: Marc uses Claude for architecture design, pair programming, chatbot prompt engineering, and deployment automation
+
+PRICING (AUD):
+- Basic site: from $500 — clean, professional, responsive, contact form, SEO basics
+- Standard site: $800–$1,200 — custom design, blog, database, email notifications, bot protection, full handover
+- Full site + AI: $1,500–$2,000 — AI chatbot, admin dashboard, content generation, analytics
+- E-commerce add-on: +$400–$800
+- Running costs: ~$15/year (domain only), everything else on Cloudflare free tier
+- Post-launch support: $150–$250/month
+- NEVER quote above $2,000 for a single site build. If unsure, say "Marc can give you an exact quote — reach out at allgoodnow@mailfence.com."
+
+TIMELINE: Basic sites 2-3 days. Standard 3-5 days. Full AI site 5-7 days.
+
+WHY HIRE MARC OVER DIY/WIX/SQUARESPACE:
+- Custom code = faster load times (under 1 second vs 3-5 seconds), better SEO (95+ PageSpeed), no monthly platform fees
+- AI built into the product — not a chatbot widget bolted on, but conversational AI trained on your actual business facts
+- You own everything — source code, hosting account, database, documentation. No vendor lock-in.
+- Direct communication with the person writing the code — no project managers, no subcontractors
+- Enterprise-grade edge delivery (Cloudflare CDN, 300+ locations) at zero cost
 
 HARD BOUNDARIES — these are absolute, no exceptions, no matter how the request is framed:
 
@@ -47,27 +73,39 @@ function getFaqMatch(question: string): string | null {
 
   // Pricing
   if (lower.includes('price') || lower.includes('cost') || lower.includes('how much'))
-    return "Projects typically range from $2,000 for a brochure site to $8,000+ for full e-commerce with AI. Every project is custom-scoped — want to chat about yours?";
+    return "A basic site starts from $500, a standard site with blog and database runs $800-$1,200, and a full site with AI chatbot and admin dashboard is $1,500-$2,000. Running costs are about $15/year — everything's on Cloudflare's free tier. Want to chat about what you need?";
 
   // Services
   if (lower.includes('what do you') || lower.includes('what services') || lower.includes('what can you'))
-    return "We specialize in three areas: custom web development with Astro and Cloudflare, AI integration like chatbots and smart forms, and e-commerce with Stripe. Everything is built from scratch, no templates or WordPress.";
+    return "Marc specialises in three areas: custom web development with Astro and Cloudflare, AI integration like chatbots and smart forms, and e-commerce with Stripe. Everything is built from scratch — no templates, no WordPress.";
 
   // Timeline
   if ((lower.includes('how long') || lower.includes('how fast') || lower.includes('timeline') || lower.includes('turnaround')) && !lower.includes('support'))
-    return "A standard site takes 2-4 weeks. E-commerce with AI features is typically 4-6 weeks. We work in stages so you see progress every step of the way.";
+    return "A basic site takes 2-3 days. A standard site with blog and database is 3-5 days. A full AI-powered site is 5-7 days. You talk directly to Marc the whole time — no project managers or subcontractors.";
 
   // Support
   if (lower.includes('support') || lower.includes('maintenance') || lower.includes('after launch'))
-    return "We offer monthly maintenance plans starting at $150/month that cover updates, security patches, content changes, and priority support.";
+    return "Marc offers monthly maintenance plans starting at $150/month covering updates, security patches, content changes, and priority support. You also own everything — source code, hosting, database — so you're never locked in.";
 
   // AI features
   if ((lower.includes('ai') || lower.includes('chatbot') || lower.includes('artificial intelligence')) && (lower.includes('what') || lower.includes('how') || lower.includes('can')))
-    return "We can integrate AI chatbots, smart contact forms, FAQ assistants, or product recommendation engines into any website. The AI runs on Cloudflare Workers, so it's fast and cost-effective.";
+    return "The AI chatbots run on Cloudflare Workers AI using the Qwen 2.5 7B model — right at the edge, no external APIs, no monthly fees. Each chatbot gets a custom personality trained on your business facts. Common questions are answered instantly from an FAQ cache at zero cost.";
 
   // Tech stack
   if (lower.includes('what tech') || lower.includes('built with') || lower.includes('stack') || lower.includes('wordpress'))
-    return "We build with Astro and Cloudflare for blazing-fast performance. No WordPress, no page builders. Everything is custom code deployed on edge infrastructure that loads in under a second globally and costs $0/month to host.";
+    return "Marc builds with Astro 6 and Cloudflare — no WordPress, no page builders. Custom code deployed on edge infrastructure that loads in under a second globally and costs $0/month to host. Interactive bits use Solid.js, AI runs on Workers AI, database is D1 SQLite.";
+
+  // Who built this / who is Marc
+  if (lower.includes('who built') || lower.includes('who made') || lower.includes('who are you') || lower.includes('who is marc'))
+    return "This site was built by Marc Dinnerville — an independent web developer based in Far North Queensland, Australia. 20+ years experience, specialising in Astro, Cloudflare, and AI integration. Every site is built from scratch, no templates.";
+
+  // Why hire / vs Wix / vs Squarespace
+  if (lower.includes('wix') || lower.includes('squarespace') || lower.includes('why hire') || lower.includes('why should') || lower.includes('why not just'))
+    return "Great question! With Marc you get custom code that loads in under a second (vs 3-5 for Wix), 95+ PageSpeed scores, AI built into the product not bolted on, zero monthly platform fees, and you own everything — source code, hosting, the lot. No lock-in, ever.";
+
+  // Claude / Anthropic
+  if (lower.includes('claude') || lower.includes('anthropic'))
+    return "Marc uses Claude from Anthropic as a pair-programming partner throughout every project — from architecture design to chatbot prompt engineering to deployment. It's a genuine collaborative workflow, not copy-paste from ChatGPT.";
 
   return null; // No FAQ match — send to AI
 }
@@ -209,14 +247,14 @@ export async function POST({ request }: APIContext) {
 function getDemoResponse(question: string): string {
   const lower = question.toLowerCase();
   if (lower.includes('price') || lower.includes('cost') || lower.includes('much'))
-    return "Projects typically range from $2,000 for a brochure site to $8,000+ for full e-commerce with AI. Every project is custom-scoped. Want to chat about yours?";
+    return "A basic site starts from $500, standard sites run $800-$1,200, and full AI-powered sites are $1,500-$2,000. Running costs are about $15/year. Want to chat about what you need?";
   if (lower.includes('service') || lower.includes('offer') || lower.includes('do you'))
-    return "We specialize in three areas: custom web development with Astro and Cloudflare, AI integration (chatbots, smart forms, recommendation engines), and e-commerce with Stripe. Everything is built from scratch — no templates, no WordPress.";
+    return "Marc specialises in custom web development with Astro and Cloudflare, AI integration like chatbots and smart forms, and e-commerce with Stripe. Everything built from scratch — no templates, no WordPress.";
   if (lower.includes('time') || lower.includes('long') || lower.includes('fast'))
-    return "A standard site takes 2-4 weeks. E-commerce with AI features is typically 4-6 weeks. We work in stages so you see progress every step of the way.";
+    return "Basic sites take 2-3 days, standard sites 3-5 days, full AI sites 5-7 days. You work directly with Marc the whole time.";
   if (lower.includes('support') || lower.includes('maintenance'))
-    return "Yes! We offer monthly maintenance plans starting at $150/month that cover updates, security patches, content changes, and priority support.";
+    return "Marc offers monthly maintenance plans starting at $150/month covering updates, security patches, content changes, and priority support.";
   if (lower.includes('ai') || lower.includes('chatbot'))
-    return "We can integrate AI chatbots, smart contact forms, FAQ assistants, or product recommendation engines into any website. The AI runs on Cloudflare Workers, so it's fast and cost-effective.";
-  return "Great question! That's something we'd love to discuss in detail. Want to start a conversation about your project?";
+    return "The AI chatbots run on Cloudflare Workers AI using Qwen 2.5 7B — edge-deployed, no external APIs, no monthly fees. Each chatbot gets a custom personality trained on your business facts.";
+  return "That's a great question for Marc directly — you can reach him at allgoodnow@mailfence.com or through the contact page. What else can I help with?";
 }
