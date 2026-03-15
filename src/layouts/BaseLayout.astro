@@ -1,0 +1,775 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  navAlwaysVisible?: boolean;
+}
+
+const { title, description = '', navAlwaysVisible = false } = Astro.props;
+
+// ── CUSTOMIZABLE: Change these per client ──
+const brandName = 'CLIENT NAME';
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/chat', label: 'Chat' },
+  { href: '/contact', label: 'Contact' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>{title}</title>
+  {description && <meta name="description" content={description} />}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  {navAlwaysVisible && <style>.site-nav { transform: translateY(0) !important; }</style>}
+</head>
+<body>
+
+<!-- WebGL particle canvas -->
+<canvas id="webgl-canvas"></canvas>
+
+<!-- Navigation -->
+<nav class="site-nav" role="navigation" aria-label="Main navigation">
+  <div class="site-nav__inner">
+    <a href="/" class="site-nav__brand">{brandName}</a>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span class="nav-toggle__bar"></span>
+      <span class="nav-toggle__bar"></span>
+      <span class="nav-toggle__bar"></span>
+    </button>
+    <ul class="site-nav__links">
+      {navLinks.map(link => (
+        <li><a href={link.href} class="site-nav__link">{link.label}</a></li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<!-- Page content -->
+<div class="page-content">
+  <slot />
+</div>
+
+<!-- Footer -->
+<div class="page-content">
+  <footer class="doc-footer">
+    <span class="doc-footer__brand">{brandName}</span>
+    <span>&copy; {new Date().getFullYear()}</span>
+  </footer>
+</div>
+
+<!-- CDN Dependencies -->
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script is:inline src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+
+</body>
+</html>
+
+<style is:global>
+  @import '../styles/theme.css';
+</style>
+
+<script>
+  // ── Effects Engine ──
+  // All portfolio effects in one script, auto-initializes on page load
+
+  const mouse = { x: 0, y: 0, nx: 0.5, ny: 0.5, dx: 0, dy: 0, speed: 0 };
+  let prevMouseX = 0, prevMouseY = 0;
+  let isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+  let isTabVisible = true;
+  let lenisInstance: any = null;
+  let pulseValue = 0;
+  let pulseVelocity = 0;
+  let lastPulseTime = 0;
+
+  const SPRING = {
+    snappy: { stiffness: 0.15, damping: 0.75, mass: 1 },
+    bouncy: { stiffness: 0.08, damping: 0.6, mass: 1 },
+    heavy:  { stiffness: 0.12, damping: 0.65, mass: 1.2 }
+  };
+
+  function springStep(current: number, target: number, velocity: number, cfg: {stiffness: number, damping: number, mass: number}) {
+    velocity += ((target - current) * cfg.stiffness) / cfg.mass;
+    velocity *= cfg.damping;
+    current += velocity;
+    return { value: current, velocity };
+  }
+
+  function triggerPulse() {
+    const now = Date.now();
+    if (now - lastPulseTime < 500) return;
+    lastPulseTime = now;
+    pulseVelocity += 0.35;
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    mouse.dx = e.clientX - prevMouseX;
+    mouse.dy = e.clientY - prevMouseY;
+    mouse.speed = Math.sqrt(mouse.dx * mouse.dx + mouse.dy * mouse.dy);
+    prevMouseX = e.clientX;
+    prevMouseY = e.clientY;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    mouse.nx = e.clientX / window.innerWidth;
+    mouse.ny = e.clientY / window.innerHeight;
+  });
+
+  document.addEventListener('visibilitychange', () => { isTabVisible = !document.hidden; });
+
+  // ── LOADER ──
+  function createLoader() {
+    const loader = document.createElement('div');
+    loader.classList.add('loader');
+    const brand = document.createElement('div');
+    brand.classList.add('loader__brand');
+    brand.textContent = document.querySelector('.site-nav__brand')?.textContent || 'Loading';
+    const bar = document.createElement('div');
+    bar.classList.add('loader__bar');
+    const barFill = document.createElement('div');
+    barFill.classList.add('loader__bar-fill');
+    bar.appendChild(barFill);
+    loader.appendChild(brand);
+    loader.appendChild(bar);
+    document.body.appendChild(loader);
+    return loader;
+  }
+
+  function runLoaderSequence(loader: HTMLElement, onComplete: () => void) {
+    const gsap = (window as any).gsap;
+    if (!gsap) { loader.remove(); onComplete(); return; }
+    const brand = loader.querySelector('.loader__brand');
+    const barFill = loader.querySelector('.loader__bar-fill');
+    const tl = gsap.timeline({
+      onComplete: () => {
+        gsap.to(loader, { opacity: 0, duration: 0.4, ease: 'power2.inOut', onComplete: () => { loader.remove(); onComplete(); } });
+      }
+    });
+    tl.to(brand, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0);
+    tl.to(barFill, { scaleX: 1, duration: 1.0, ease: 'power1.inOut' }, 0.2);
+    tl.to({}, { duration: 0.3 });
+  }
+
+  // ── PAGE TRANSITIONS ──
+  function initPageTransitions() {
+    const overlay = document.createElement('div');
+    overlay.classList.add('page-transition');
+    document.body.appendChild(overlay);
+    const gsap = (window as any).gsap;
+
+    if (sessionStorage.getItem('page-transitioning')) {
+      sessionStorage.removeItem('page-transitioning');
+      overlay.style.transformOrigin = 'right';
+      overlay.style.transform = 'scaleX(1)';
+      if (gsap) {
+        gsap.to(overlay, { scaleX: 0, duration: 0.5, ease: 'power2.inOut', delay: 0.1, onComplete: () => { overlay.style.transform = ''; overlay.style.transformOrigin = ''; } });
+      } else { overlay.style.transform = ''; }
+    }
+
+    document.addEventListener('click', (e) => {
+      const link = (e.target as HTMLElement).closest('a[href]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:') || href.startsWith('http://') || href.startsWith('https://') || (link as HTMLAnchorElement).target === '_blank') return;
+      e.preventDefault();
+      if (gsap) {
+        overlay.style.transformOrigin = 'left';
+        overlay.style.transform = 'scaleX(0)';
+        sessionStorage.setItem('page-transitioning', '1');
+        gsap.to(overlay, { scaleX: 1, duration: 0.4, ease: 'power2.inOut', onComplete: () => { window.location.href = href; } });
+      } else { window.location.href = href; }
+    });
+  }
+
+  // ── LENIS ──
+  function initLenis() {
+    const Lenis = (window as any).Lenis;
+    const gsap = (window as any).gsap;
+    const ScrollTrigger = (window as any).ScrollTrigger;
+    if (!Lenis) return;
+    lenisInstance = new Lenis({ duration: 1.2, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), touchMultiplier: 1.5, infinite: false });
+    if (gsap && ScrollTrigger) {
+      lenisInstance.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time: number) => { lenisInstance.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
+    } else {
+      function raf(time: number) { lenisInstance.raf(time); requestAnimationFrame(raf); }
+      requestAnimationFrame(raf);
+    }
+  }
+
+  // ── AUTO-PARALLAX ──
+  function initAutoParallax() {
+    document.querySelectorAll('.accent-rule').forEach((el) => {
+      if (!el.hasAttribute('data-parallax')) el.setAttribute('data-parallax', '0.15');
+    });
+    document.querySelectorAll('.doc-header .stats').forEach((el) => {
+      if (!el.hasAttribute('data-parallax')) el.setAttribute('data-parallax', '0.08');
+    });
+  }
+
+  // ── WEBGL PARTICLES ──
+  function initParticles() {
+    const canvas = document.getElementById('webgl-canvas') as HTMLCanvasElement;
+    const THREE = (window as any).THREE;
+    if (!canvas || !THREE) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 300;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const COUNT = isTouchDevice ? 800 : 2000;
+    const positions = new Float32Array(COUNT * 3);
+    const velocities = new Float32Array(COUNT * 3);
+    const springVels = new Float32Array(COUNT * 3);
+    const sizes = new Float32Array(COUNT);
+    const opacities = new Float32Array(COUNT);
+
+    for (let i = 0; i < COUNT; i++) {
+      const i3 = i * 3;
+      positions[i3] = (Math.random() - 0.5) * 600;
+      positions[i3 + 1] = (Math.random() - 0.5) * 600;
+      positions[i3 + 2] = (Math.random() - 0.5) * 400;
+      velocities[i3] = (Math.random() - 0.5) * 0.15;
+      velocities[i3 + 1] = (Math.random() - 0.5) * 0.15;
+      velocities[i3 + 2] = (Math.random() - 0.5) * 0.05;
+      const depth = (positions[i3 + 2] + 200) / 400;
+      sizes[i] = 1.5 + depth * 2.5;
+      opacities[i] = 0.2 + depth * 0.6;
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute('aOpacity', new THREE.BufferAttribute(opacities, 1));
+
+    const material = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: {
+        uColor: { value: new THREE.Color(0xc8952a) },
+        uWarmColor: { value: new THREE.Color(0xffd966) },
+        uTime: { value: 0 },
+        uMouseWorld: { value: new THREE.Vector3(0, 0, 0) },
+        uPulse: { value: 0 },
+        uScrollDepth: { value: 0 }
+      },
+      vertexShader: `
+        attribute float aSize;
+        attribute float aOpacity;
+        uniform vec3 uMouseWorld;
+        uniform float uPulse;
+        varying float vOpacity;
+        varying float vProximity;
+        void main() {
+          vOpacity = aOpacity;
+          float dist = distance(position, uMouseWorld);
+          vProximity = smoothstep(120.0, 0.0, dist);
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          float sizeBoost = 1.0 + vProximity * 0.8 + uPulse * 0.3;
+          gl_PointSize = aSize * sizeBoost * (200.0 / -mvPosition.z);
+          float camDist = -mvPosition.z;
+          if (camDist < 30.0) { vOpacity *= smoothstep(5.0, 30.0, camDist); }
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uColor;
+        uniform vec3 uWarmColor;
+        uniform float uPulse;
+        varying float vOpacity;
+        varying float vProximity;
+        void main() {
+          float dist = length(gl_PointCoord - vec2(0.5));
+          if (dist > 0.5) discard;
+          float alpha = smoothstep(0.5, 0.1, dist) * vOpacity;
+          vec3 color = mix(uColor, uWarmColor, vProximity * 0.7);
+          alpha *= 1.0 + uPulse * 0.5;
+          color = mix(color, uWarmColor, uPulse * 0.3);
+          gl_FragColor = vec4(color, alpha);
+        }
+      `
+    });
+
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    let camXVel = 0, camYVel = 0, camZVel = 0;
+    let camRoll = 0, camRollVel = 0;
+    let camTargetZ = 300;
+    const mouse3D = new THREE.Vector3();
+    const mouseNDC = new THREE.Vector3();
+
+    function updateMouse3D() {
+      mouseNDC.set(mouse.nx * 2 - 1, -(mouse.ny) * 2 + 1, 0.5);
+      mouse3D.copy(mouseNDC).unproject(camera);
+    }
+
+    let scrollProgress = 0, scrollVelocity = 0, lastScrollY = 0;
+
+    function updateScrollState() {
+      if (lenisInstance) {
+        scrollProgress = Math.min(1, lenisInstance.scroll / (document.body.scrollHeight - window.innerHeight || 1));
+        scrollVelocity = Math.abs(lenisInstance.velocity || 0);
+      } else {
+        const sy = window.scrollY;
+        scrollVelocity = Math.abs(sy - lastScrollY);
+        lastScrollY = sy;
+        scrollProgress = Math.min(1, sy / (document.body.scrollHeight - window.innerHeight || 1));
+      }
+    }
+
+    function triggerShockwave() {
+      updateMouse3D();
+      const pos = geometry.attributes.position.array;
+      for (let i = 0; i < COUNT; i++) {
+        const i3 = i * 3;
+        const dx = pos[i3] - mouse3D.x;
+        const dy = pos[i3 + 1] - mouse3D.y;
+        const dz = pos[i3 + 2] - mouse3D.z;
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist < 150 && dist > 0.1) {
+          const force = (1 - dist / 150) * 8;
+          springVels[i3] += (dx / dist) * force;
+          springVels[i3 + 1] += (dy / dist) * force;
+          springVels[i3 + 2] += (dz / dist) * force;
+        }
+      }
+      pulseVelocity += 0.5;
+    }
+
+    document.addEventListener('click', triggerShockwave);
+    if (isTouchDevice) document.addEventListener('touchstart', triggerShockwave);
+
+    function animate() {
+      if (!isTabVisible) { requestAnimationFrame(animate); return; }
+      material.uniforms.uTime.value += 0.01;
+      updateScrollState();
+
+      if (!isTouchDevice) {
+        updateMouse3D();
+        material.uniforms.uMouseWorld.value.copy(mouse3D);
+      }
+
+      const ps = springStep(pulseValue, 0, pulseVelocity, SPRING.heavy);
+      pulseValue = ps.value; pulseVelocity = ps.velocity;
+      material.uniforms.uPulse.value = Math.max(0, pulseValue);
+      material.uniforms.uScrollDepth.value = scrollProgress;
+
+      camTargetZ = 300 - scrollProgress * 180;
+      const camXTarget = (mouse.nx - 0.5) * 40;
+      const camYTarget = (mouse.ny - 0.5) * -40;
+
+      const szx = springStep(camera.position.x, camXTarget, camXVel, SPRING.snappy);
+      camera.position.x = szx.value; camXVel = szx.velocity;
+      const szy = springStep(camera.position.y, camYTarget, camYVel, SPRING.snappy);
+      camera.position.y = szy.value; camYVel = szy.velocity;
+      const szz = springStep(camera.position.z, camTargetZ, camZVel, SPRING.snappy);
+      camera.position.z = szz.value; camZVel = szz.velocity;
+      camera.lookAt(scene.position);
+
+      const rollTarget = Math.max(-0.06, Math.min(0.06, scrollVelocity * 0.003 * (scrollProgress > 0.5 ? -1 : 1)));
+      const sr = springStep(camRoll, scrollVelocity > 2 ? rollTarget : 0, camRollVel, SPRING.bouncy);
+      camRoll = sr.value; camRollVel = sr.velocity;
+      camera.rotation.z = camRoll;
+
+      const scrollBoost = 1 + Math.min(scrollVelocity * 0.15, 5);
+      const pos = geometry.attributes.position.array;
+      const gravityActive = !isTouchDevice && mouse.speed > 0.5;
+      const flingActive = !isTouchDevice && mouse.speed > 8;
+
+      for (let i = 0; i < COUNT; i++) {
+        const i3 = i * 3;
+        pos[i3] += velocities[i3] * scrollBoost;
+        pos[i3 + 1] += velocities[i3 + 1] * scrollBoost;
+        pos[i3 + 2] += velocities[i3 + 2] * scrollBoost;
+
+        if (gravityActive) {
+          const dx = mouse3D.x - pos[i3];
+          const dy = mouse3D.y - pos[i3 + 1];
+          const dz = mouse3D.z - pos[i3 + 2];
+          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          if (dist < 120 && dist > 0.1) {
+            const pull = ((1 - dist / 120) * 0.5) * 0.5;
+            springVels[i3] += dx / dist * pull;
+            springVels[i3 + 1] += dy / dist * pull;
+            springVels[i3 + 2] += dz / dist * pull;
+          }
+          if (flingActive && dist < 80) {
+            const flingForce = Math.min(mouse.speed * 0.08, 3);
+            springVels[i3] += (mouse.dx / mouse.speed) * flingForce * (1 - dist / 80);
+            springVels[i3 + 1] += (mouse.dy / mouse.speed) * flingForce * (1 - dist / 80);
+          }
+        }
+
+        springVels[i3] *= SPRING.bouncy.damping;
+        springVels[i3 + 1] *= SPRING.bouncy.damping;
+        springVels[i3 + 2] *= SPRING.bouncy.damping;
+        pos[i3] += springVels[i3];
+        pos[i3 + 1] += springVels[i3 + 1];
+        pos[i3 + 2] += springVels[i3 + 2];
+
+        if (pos[i3] > 300) pos[i3] = -300;
+        if (pos[i3] < -300) pos[i3] = 300;
+        if (pos[i3 + 1] > 300) pos[i3 + 1] = -300;
+        if (pos[i3 + 1] < -300) pos[i3 + 1] = 300;
+        if (pos[i3 + 2] > 200) pos[i3 + 2] = -200;
+        if (pos[i3 + 2] < -200) pos[i3 + 2] = 200;
+      }
+
+      geometry.attributes.position.needsUpdate = true;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  }
+
+  // ── 3D TILT CARDS ──
+  function initTilt() {
+    if (isTouchDevice) return;
+    document.querySelectorAll('.card, .showcase-card, .stat, .highlight-box').forEach((el) => {
+      let currentX = 0, currentY = 0, velX = 0, velY = 0, targetX = 0, targetY = 0;
+      let rafId: number | null = null;
+      let active = false;
+      const tiltSpring = { stiffness: 0.12, damping: 0.65, mass: 1 };
+      const htmlEl = el as HTMLElement;
+
+      htmlEl.addEventListener('mouseenter', () => { active = true; htmlEl.style.transition = 'box-shadow 0.4s ease'; if (!rafId) tick(); });
+      htmlEl.addEventListener('mousemove', (e) => {
+        const rect = htmlEl.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        targetX = (y - 0.5) * -14; targetY = (x - 0.5) * 14;
+        htmlEl.style.boxShadow = `${(x - 0.5) * -20}px ${(y - 0.5) * -20}px 35px rgba(0,0,0,0.35), 0 0 20px rgba(200,149,42,0.08)`;
+      });
+      htmlEl.addEventListener('mouseleave', () => {
+        targetX = 0; targetY = 0;
+        htmlEl.style.transition = 'box-shadow 0.6s ease';
+        htmlEl.style.boxShadow = '';
+        setTimeout(() => { active = false; }, 1200);
+      });
+
+      function tick() {
+        const sx = springStep(currentX, targetX, velX, tiltSpring);
+        const sy = springStep(currentY, targetY, velY, tiltSpring);
+        currentX = sx.value; velX = sx.velocity;
+        currentY = sy.value; velY = sy.velocity;
+        htmlEl.style.transform = `perspective(800px) rotateX(${currentX}deg) rotateY(${currentY}deg) translateZ(8px)`;
+        if (Math.abs(velX) > 0.001 || Math.abs(velY) > 0.001 || active) {
+          rafId = requestAnimationFrame(tick);
+        } else { rafId = null; htmlEl.style.transform = ''; }
+      }
+    });
+  }
+
+  // ── EMBERS ──
+  function initEmbers() {
+    document.querySelectorAll('.doc-header').forEach((header) => {
+      const count = isTouchDevice ? 6 : 14;
+      for (let i = 0; i < count; i++) {
+        const ember = document.createElement('div');
+        ember.classList.add('ember');
+        if (Math.random() > 0.5) ember.classList.add('ember--warm');
+        ember.style.left = Math.random() * 100 + '%';
+        ember.style.setProperty('--ember-duration', (2.5 + Math.random() * 3) + 's');
+        ember.style.setProperty('--ember-delay', (Math.random() * 4) + 's');
+        ember.style.setProperty('--ember-drift', ((Math.random() - 0.5) * 40) + 'px');
+        header.appendChild(ember);
+      }
+    });
+  }
+
+  // ── CUSTOM CURSOR ──
+  function initCursor() {
+    if (isTouchDevice) return;
+    const dot = document.createElement('div'); dot.classList.add('cursor-dot');
+    const ring = document.createElement('div'); ring.classList.add('cursor-ring');
+    document.body.appendChild(dot); document.body.appendChild(ring);
+
+    const SPARKLE_COUNT = 8;
+    const sparkles: {el: HTMLElement, life: number, x: number, y: number, vx: number, vy: number}[] = [];
+    for (let i = 0; i < SPARKLE_COUNT; i++) {
+      const s = document.createElement('div'); s.classList.add('cursor-sparkle'); document.body.appendChild(s);
+      sparkles.push({ el: s, life: 0, x: 0, y: 0, vx: 0, vy: 0 });
+    }
+    let sparkleIndex = 0, lastSparkleTime = 0;
+    let dotX = 0, dotY = 0, dotVX = 0, dotVY = 0;
+    let ringX = 0, ringY = 0, ringVX = 0, ringVY = 0;
+    const dotSpring = { stiffness: 0.2, damping: 0.7, mass: 0.8 };
+    const ringSpring = { stiffness: 0.1, damping: 0.6, mass: 1.3 };
+
+    function updateCursor() {
+      const dx = springStep(dotX, mouse.x, dotVX, dotSpring);
+      const dy = springStep(dotY, mouse.y, dotVY, dotSpring);
+      dotX = dx.value; dotVX = dx.velocity; dotY = dy.value; dotVY = dy.velocity;
+      dot.style.left = dotX + 'px'; dot.style.top = dotY + 'px';
+
+      const rx = springStep(ringX, mouse.x, ringVX, ringSpring);
+      const ry = springStep(ringY, mouse.y, ringVY, ringSpring);
+      ringX = rx.value; ringVX = rx.velocity; ringY = ry.value; ringVY = ry.velocity;
+      ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+
+      const ringSpeed = Math.sqrt(ringVX * ringVX + ringVY * ringVY);
+      ring.style.transform = `translate(-50%,-50%) scale(${1 + Math.min(ringSpeed * 0.03, 0.4)})`;
+
+      for (let i = 0; i < SPARKLE_COUNT; i++) {
+        const sp = sparkles[i];
+        if (sp.life > 0) {
+          sp.life -= 0.02; sp.x += sp.vx; sp.y += sp.vy; sp.vy += 0.05; sp.vx *= 0.98;
+          sp.el.style.left = sp.x + 'px'; sp.el.style.top = sp.y + 'px';
+          sp.el.style.opacity = String(sp.life); sp.el.style.transform = `translate(-50%,-50%) scale(${sp.life})`;
+        }
+      }
+      requestAnimationFrame(updateCursor);
+    }
+    updateCursor();
+
+    document.addEventListener('mousemove', () => {
+      const now = Date.now();
+      if (now - lastSparkleTime < 80) return;
+      lastSparkleTime = now;
+      const sp = sparkles[sparkleIndex % SPARKLE_COUNT];
+      sp.life = 1; sp.x = mouse.x; sp.y = mouse.y;
+      sp.vx = (Math.random() - 0.5) * 3; sp.vy = (Math.random() - 0.5) * 3 - 1;
+      sp.el.style.opacity = '1'; sparkleIndex++;
+    });
+
+    document.addEventListener('mouseover', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.cta-block a, .showcase-card')) {
+        document.body.classList.add('cursor--cta'); document.body.classList.remove('cursor--hover');
+      } else if (target.closest('a, button, .tag, .nav-toggle, .site-nav__link')) {
+        document.body.classList.add('cursor--hover'); document.body.classList.remove('cursor--cta');
+      }
+    });
+    document.addEventListener('mouseout', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('a, button, .tag, .nav-toggle, .site-nav__link, .cta-block a, .showcase-card')) {
+        document.body.classList.remove('cursor--hover', 'cursor--cta');
+      }
+    });
+  }
+
+  // ── GSAP SCROLL ANIMATIONS ──
+  function initScrollAnimations() {
+    const gsap = (window as any).gsap;
+    const ScrollTrigger = (window as any).ScrollTrigger;
+    if (!gsap || !ScrollTrigger) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.utils.toArray('[data-reveal]').forEach((el: Element) => {
+      gsap.fromTo(el, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true, onEnter: triggerPulse }
+      });
+    });
+    gsap.utils.toArray('[data-reveal-left]').forEach((el: Element) => {
+      gsap.fromTo(el, { x: -50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      });
+    });
+    gsap.utils.toArray('[data-reveal-right]').forEach((el: Element) => {
+      gsap.fromTo(el, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      });
+    });
+    gsap.utils.toArray('[data-reveal-scale]').forEach((el: Element) => {
+      gsap.fromTo(el, { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      });
+    });
+    gsap.utils.toArray('[data-stagger]').forEach((container: Element) => {
+      gsap.fromTo(container.children, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', stagger: 0.08,
+        scrollTrigger: { trigger: container, start: 'top 88%', once: true }
+      });
+    });
+    gsap.utils.toArray('[data-parallax]').forEach((el: Element) => {
+      const speed = parseFloat((el as HTMLElement).dataset.parallax || '0.2');
+      gsap.to(el, { y: () => speed * -100, ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 1 }
+      });
+    });
+  }
+
+  // ── COUNT-UP ──
+  function initCountUp() {
+    const gsap = (window as any).gsap;
+    const ScrollTrigger = (window as any).ScrollTrigger;
+    if (!gsap || !ScrollTrigger) return;
+    document.querySelectorAll('[data-count]').forEach((el) => {
+      const htmlEl = el as HTMLElement;
+      const target = parseFloat(htmlEl.dataset.count || '0');
+      const suffix = htmlEl.dataset.countSuffix || '';
+      const prefix = htmlEl.dataset.countPrefix || '';
+      const hasDecimal = String(target).includes('.');
+      const decimals = hasDecimal ? String(target).split('.')[1].length : 0;
+      const obj = { val: 0 };
+      ScrollTrigger.create({
+        trigger: el, start: 'top 88%', once: true,
+        onEnter: () => {
+          gsap.to(obj, { val: target, duration: 1.8, ease: 'power2.out',
+            onUpdate: () => { htmlEl.textContent = prefix + (hasDecimal ? obj.val.toFixed(decimals) : Math.round(obj.val)) + suffix; }
+          });
+        }
+      });
+    });
+  }
+
+  // ── LETTER STAGGER ──
+  function initLetterStagger() {
+    const gsap = (window as any).gsap;
+    const ScrollTrigger = (window as any).ScrollTrigger;
+    if (!gsap || !ScrollTrigger) return;
+    document.querySelectorAll('.section-label[data-letter-stagger]').forEach((label) => {
+      const text = label.textContent || '';
+      label.textContent = '';
+      label.setAttribute('aria-label', text);
+      text.split('').forEach((char) => {
+        const span = document.createElement('span');
+        span.classList.add('char');
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        label.appendChild(span);
+      });
+      const chars = label.querySelectorAll('.char');
+      ScrollTrigger.create({ trigger: label, start: 'top 90%', once: true,
+        onEnter: () => { gsap.to(chars, { opacity: 1, duration: 0.05, stagger: 0.04, ease: 'none' }); }
+      });
+    });
+  }
+
+  // ── HERO ANIMATION ──
+  function initHeroAnimation(delay = 0.3) {
+    const gsap = (window as any).gsap;
+    if (!gsap) return;
+    const heroTitle = document.querySelector('.landing-hero__title, .doc-header h1') as HTMLElement;
+    if (!heroTitle) return;
+    const text = heroTitle.textContent || '';
+    heroTitle.textContent = '';
+    heroTitle.style.opacity = '1';
+    text.split('').forEach((char) => {
+      const span = document.createElement('span');
+      span.style.display = 'inline-block'; span.style.opacity = '0'; span.style.transform = 'translateY(30px)';
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      heroTitle.appendChild(span);
+    });
+    const spans = heroTitle.querySelectorAll('span');
+    gsap.to(spans, { opacity: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power3.out', delay });
+
+    const tagline = document.querySelector('.doc-header .tagline, .landing-hero__sub');
+    if (tagline) gsap.fromTo(tagline, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: delay + spans.length * 0.03 + 0.2 });
+
+    const nameEl = document.querySelector('.landing-hero__name');
+    if (nameEl) gsap.fromTo(nameEl, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: delay + spans.length * 0.03 + 0.4 });
+
+    const stats = document.querySelector('.doc-header .stats, .landing-hero .stats');
+    if (stats) gsap.fromTo(stats, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: delay + spans.length * 0.03 + 0.5 });
+  }
+
+  // ── NAV ──
+  function initNav() {
+    const nav = document.querySelector('.site-nav');
+    if (!nav) return;
+    const toggle = nav.querySelector('.nav-toggle');
+    const linksList = nav.querySelector('.site-nav__links');
+    const links = nav.querySelectorAll('.site-nav__link');
+    let navVisible = false;
+
+    function closeMobileMenu() {
+      linksList?.classList.remove('site-nav__links--open');
+      toggle?.classList.remove('nav-toggle--open');
+      toggle?.setAttribute('aria-expanded', 'false');
+    }
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      if (scrollY > 80 && !navVisible) { nav.classList.add('site-nav--visible'); navVisible = true; }
+      else if (scrollY <= 80 && navVisible) { nav.classList.remove('site-nav--visible'); navVisible = false; closeMobileMenu(); }
+    }, { passive: true });
+
+    toggle?.addEventListener('click', () => {
+      const isOpen = linksList?.classList.toggle('site-nav__links--open');
+      toggle.classList.toggle('nav-toggle--open', !!isOpen);
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    links.forEach((link) => { link.addEventListener('click', () => { if (window.innerWidth <= 768) closeMobileMenu(); }); });
+    document.addEventListener('click', (e) => { if (!nav.contains(e.target as Node) && linksList?.classList.contains('site-nav__links--open')) closeMobileMenu(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && linksList?.classList.contains('site-nav__links--open')) { closeMobileMenu(); (toggle as HTMLElement)?.focus(); } });
+
+    // Mark current page
+    const currentPath = window.location.pathname;
+    links.forEach((link) => {
+      const href = link.getAttribute('href');
+      if (href === currentPath || (href === '/' && currentPath === '/')) link.classList.add('site-nav__link--active');
+    });
+
+    // Scroll spy
+    const sections = document.querySelectorAll('.section[id]');
+    if (sections.length > 0) {
+      window.addEventListener('scroll', () => {
+        const scrollPos = window.scrollY + 120;
+        let current = '';
+        sections.forEach((section) => { if ((section as HTMLElement).offsetTop <= scrollPos) current = section.id; });
+        links.forEach((link) => {
+          const href = link.getAttribute('href');
+          if (href?.includes('#')) link.classList.toggle('site-nav__link--active', href.split('#')[1] === current);
+        });
+      }, { passive: true });
+    }
+  }
+
+  // ── SMOOTH SCROLL ANCHORS ──
+  function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const target = document.querySelector(link.getAttribute('href') || '');
+        if (!target) return;
+        e.preventDefault();
+        if (lenisInstance) { lenisInstance.scrollTo(target, { offset: 0 }); }
+        else { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+    });
+  }
+
+  // ── INIT ──
+  function init() {
+    const loader = createLoader();
+    initParticles();
+    initPageTransitions();
+    initLenis();
+    initAutoParallax();
+    initNav();
+
+    runLoaderSequence(loader, () => {
+      initTilt();
+      initEmbers();
+      initCursor();
+      initScrollAnimations();
+      initCountUp();
+      initLetterStagger();
+      initHeroAnimation(0.1);
+      initSmoothScroll();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+</script>

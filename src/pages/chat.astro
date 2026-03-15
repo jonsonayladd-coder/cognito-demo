@@ -1,0 +1,392 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Chat — Client Name" description="Talk to our AI assistant." navAlwaysVisible={true}>
+
+  <section class="chat-page">
+    <div class="rift-wrap">
+      <!-- Rift effects -->
+      <span class="rift-glow"></span>
+      <span class="rift-scanline"></span>
+      <span class="rift-corner rift-corner--tl"></span>
+      <span class="rift-corner rift-corner--tr"></span>
+      <span class="rift-corner rift-corner--bl"></span>
+      <span class="rift-corner rift-corner--br"></span>
+      <!-- Embers — staggered timing + drift for organic feel -->
+      <span class="rift-ember" style="left:6%;--e-delay:0s;--e-dur:3.2s;--e-drift:-7px"></span>
+      <span class="rift-ember" style="left:28%;--e-delay:1.1s;--e-dur:4.1s;--e-drift:12px"></span>
+      <span class="rift-ember rift-ember--warm" style="left:52%;--e-delay:0.4s;--e-dur:4.8s;--e-drift:16px"></span>
+      <span class="rift-ember" style="right:22%;--e-delay:1.7s;--e-dur:3.6s;--e-drift:-9px"></span>
+      <span class="rift-ember rift-ember--warm" style="right:8%;--e-delay:2.3s;--e-dur:3.9s;--e-drift:-13px"></span>
+      <span class="rift-ember" style="left:42%;--e-delay:0.7s;--e-dur:5.2s;--e-drift:8px"></span>
+
+      <div class="chat-page__container rift-panel">
+        <div class="chat-page__header">
+          <div class="chat-page__status">
+            <span class="chat-page__dot"></span>
+            <span>AI Assistant</span>
+          </div>
+          <p class="chat-page__intro">Ask me anything about our services, pricing, or process.</p>
+        </div>
+
+        <div class="chat-page__messages" id="chat-messages">
+          <!-- Messages will be inserted here -->
+        </div>
+
+        <div class="chat-page__input-area">
+          <input
+            type="text"
+            id="chat-input"
+            class="chat-page__input"
+            placeholder="Type your message..."
+            maxlength="500"
+            autocomplete="off"
+          >
+          <button id="chat-send" class="chat-page__send" aria-label="Send message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style is:global>
+  .chat-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 1rem 2rem;
+  }
+
+  .chat-page__container {
+    width: 100%;
+    max-width: 640px;
+    height: calc(100vh - 7rem);
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+    /* Visual effects handled by .rift-panel in theme.css */
+  }
+
+  .chat-page__header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-card);
+    background: var(--bg-darker);
+  }
+
+  .chat-page__status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cream);
+  }
+
+  .chat-page__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+    animation: chatDotPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes chatDotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .chat-page__intro {
+    font-size: 0.8rem;
+    color: var(--cream-faint);
+    margin-top: 0.25rem;
+  }
+
+  .chat-page__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-dim) transparent;
+  }
+
+  .chat-page__messages::-webkit-scrollbar { width: 4px; }
+  .chat-page__messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-page__messages::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 2px; }
+
+  .chat-msg {
+    max-width: 85%;
+    animation: chatMsgIn 0.3s ease-out;
+  }
+
+  .chat-msg--user { align-self: flex-end; }
+  .chat-msg--ai { align-self: flex-start; }
+
+  .chat-msg__text {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+  }
+
+  .chat-msg--user .chat-msg__text {
+    background: rgba(200, 149, 42, 0.15);
+    color: var(--cream);
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-msg--ai .chat-msg__text {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(200, 149, 42, 0.12);
+    color: var(--text-body);
+    border-bottom-left-radius: 4px;
+  }
+
+  @keyframes chatMsgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .chat-typing {
+    display: flex;
+    gap: 4px;
+    padding: 0.625rem 1rem;
+    align-self: flex-start;
+  }
+
+  .chat-typing__dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.4;
+    animation: chatTypingBounce 1.4s ease-in-out infinite;
+  }
+
+  .chat-typing__dot:nth-child(2) { animation-delay: 0.2s; }
+  .chat-typing__dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes chatTypingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  .chat-page__input-area {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.25rem;
+    border-top: 1px solid var(--border-card);
+    background: var(--bg-darker);
+  }
+
+  .chat-page__input {
+    flex: 1;
+    background: rgba(244, 237, 221, 0.04);
+    border: 1px solid var(--border-card);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .chat-page__input::placeholder { color: var(--cream-faint); }
+  .chat-page__input:focus { border-color: var(--accent); }
+  .chat-page__input:disabled { opacity: 0.5; }
+
+  .chat-page__send {
+    background: var(--accent);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 8px;
+    width: 40px; height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .chat-page__send:hover {
+    background: var(--accent-bright);
+    transform: scale(1.05);
+  }
+
+  .chat-page__send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  @media (max-width: 480px) {
+    .chat-page { padding: 4rem 0.5rem 1rem; }
+    .chat-page__container {
+      max-height: none;
+      height: calc(100vh - 5rem);
+      border-radius: 12px;
+    }
+  }
+</style>
+
+<script>
+  // ── CHATBOT ──
+  // Configure these per client:
+  const CHAT_API = '/api/chat'; // Change to client's AI worker URL
+  const WELCOME_MESSAGE = "Hi! I'm the AI assistant. Ask me anything about our services, pricing, or how we can help with your project.";
+
+  const messagesEl = document.getElementById('chat-messages') as HTMLDivElement;
+  const inputEl = document.getElementById('chat-input') as HTMLInputElement;
+  const sendBtn = document.getElementById('chat-send') as HTMLButtonElement;
+
+  // Restore conversation from sessionStorage
+  const STORAGE_KEY = 'chat_history';
+  let history: {role: string, content: string}[] = [];
+  try {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    if (saved) history = JSON.parse(saved);
+  } catch { /* ignore parse errors */ }
+
+  function saveHistory() {
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch {}
+  }
+
+  let isTyping = false;
+
+  function createMessageEl(role: 'user' | 'ai'): { container: HTMLDivElement, textEl: HTMLDivElement } {
+    const container = document.createElement('div');
+    container.classList.add('chat-msg', `chat-msg--${role}`);
+    const textEl = document.createElement('div');
+    textEl.classList.add('chat-msg__text');
+    container.appendChild(textEl);
+    return { container, textEl };
+  }
+
+  function showWelcome() {
+    const { container, textEl } = createMessageEl('ai');
+    textEl.textContent = WELCOME_MESSAGE;
+    messagesEl.appendChild(container);
+  }
+
+  function addMessage(text: string, role: 'user' | 'ai') {
+    const { container, textEl } = createMessageEl(role);
+    messagesEl.appendChild(container);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    if (role === 'ai') {
+      // Typewriter effect
+      let i = 0;
+      const speed = text.length > 200 ? 12 : 22;
+      function type() {
+        if (i < text.length) {
+          textEl.textContent = (textEl.textContent || '') + text[i];
+          i++;
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+          setTimeout(type, speed);
+        }
+      }
+      type();
+    } else {
+      textEl.textContent = text;
+    }
+  }
+
+  function showTyping() {
+    const typing = document.createElement('div');
+    typing.classList.add('chat-typing');
+    typing.id = 'typing-indicator';
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement('div');
+      dot.classList.add('chat-typing__dot');
+      typing.appendChild(dot);
+    }
+    messagesEl.appendChild(typing);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function hideTyping() {
+    document.getElementById('typing-indicator')?.remove();
+  }
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text || isTyping) return;
+
+    inputEl.value = '';
+    addMessage(text, 'user');
+    history.push({ role: 'user', content: text });
+    saveHistory();
+
+    isTyping = true;
+    inputEl.disabled = true;
+    sendBtn.disabled = true;
+    showTyping();
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+
+      const res = await fetch(CHAT_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: history.slice(-10) }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!res.ok) throw new Error('API error');
+
+      const data = await res.json();
+      const reply = data.reply || data.response || data.message || "Sorry, I couldn't process that.";
+
+      hideTyping();
+      addMessage(reply, 'ai');
+      history.push({ role: 'assistant', content: reply });
+      saveHistory();
+
+    } catch {
+      hideTyping();
+      addMessage("Sorry, I'm having trouble connecting right now. Please try again in a moment.", 'ai');
+    } finally {
+      isTyping = false;
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+
+    if (history.length > 20) history.splice(0, 2);
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+  // Restore previous conversation or show welcome
+  if (history.length > 0) {
+    for (const msg of history) {
+      const role = msg.role === 'user' ? 'user' : 'ai';
+      const { container, textEl } = createMessageEl(role);
+      textEl.textContent = msg.content;
+      messagesEl.appendChild(container);
+    }
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  } else {
+    showWelcome();
+  }
+  inputEl.focus();
+</script>

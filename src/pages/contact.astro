@@ -1,0 +1,848 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Contact — Client Name" description="Start your project with our AI-powered brief builder." navAlwaysVisible={true}>
+
+  <section class="wizard-page">
+    <div class="wizard">
+
+      <!-- LEFT: Conversation -->
+      <div class="rift-wrap">
+        <span class="rift-glow"></span>
+        <span class="rift-scanline"></span>
+        <span class="rift-corner rift-corner--tl"></span>
+        <span class="rift-corner rift-corner--tr"></span>
+        <span class="rift-corner rift-corner--bl"></span>
+        <span class="rift-corner rift-corner--br"></span>
+        <span class="rift-ember" style="left:5%;--e-delay:0s;--e-dur:3.4s;--e-drift:-5px"></span>
+        <span class="rift-ember" style="left:35%;--e-delay:1.2s;--e-dur:4.3s;--e-drift:10px"></span>
+        <span class="rift-ember rift-ember--warm" style="right:28%;--e-delay:0.6s;--e-dur:4.7s;--e-drift:-8px"></span>
+        <span class="rift-ember" style="right:8%;--e-delay:1.9s;--e-dur:3.8s;--e-drift:7px"></span>
+
+        <div class="wizard__chat rift-panel">
+          <div class="wizard__chat-header">
+            <div class="wizard__status">
+              <span class="wizard__dot"></span>
+              <span>Project Assistant</span>
+            </div>
+            <p class="wizard__subtitle">Let's build your perfect brief together.</p>
+          </div>
+
+          <div class="wizard__messages" id="wizard-messages">
+            <!-- Messages injected by JS -->
+          </div>
+
+          <div class="wizard__input-area" id="wizard-input-area">
+            <!-- Dynamic: options or text input appear here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live Brief -->
+      <div class="rift-wrap rift-wrap--subtle">
+        <span class="rift-glow"></span>
+        <span class="rift-corner rift-corner--tl"></span>
+        <span class="rift-corner rift-corner--tr"></span>
+        <span class="rift-corner rift-corner--bl"></span>
+        <span class="rift-corner rift-corner--br"></span>
+
+        <div class="wizard__brief rift-panel rift-panel--subtle">
+          <div class="wizard__brief-header">
+          <h3 class="wizard__brief-title">Your Project Brief</h3>
+          <div class="wizard__brief-progress">
+            <div class="wizard__brief-bar" id="brief-bar"></div>
+          </div>
+          <span class="wizard__brief-step" id="brief-step">Step 1 of 6</span>
+        </div>
+
+        <div class="wizard__brief-body" id="brief-body">
+          <div class="brief-field" id="brief-name">
+            <span class="brief-field__label">Name</span>
+            <span class="brief-field__value brief-field__value--empty">Waiting...</span>
+          </div>
+          <div class="brief-field" id="brief-email">
+            <span class="brief-field__label">Email</span>
+            <span class="brief-field__value brief-field__value--empty">Waiting...</span>
+          </div>
+          <div class="brief-field" id="brief-project">
+            <span class="brief-field__label">Project Type</span>
+            <span class="brief-field__value brief-field__value--empty">Waiting...</span>
+          </div>
+          <div class="brief-field" id="brief-budget">
+            <span class="brief-field__label">Budget</span>
+            <span class="brief-field__value brief-field__value--empty">Waiting...</span>
+          </div>
+          <div class="brief-field" id="brief-timeline">
+            <span class="brief-field__label">Timeline</span>
+            <span class="brief-field__value brief-field__value--empty">Waiting...</span>
+          </div>
+          <div class="brief-field" id="brief-details">
+            <span class="brief-field__label">Details</span>
+            <span class="brief-field__value brief-field__value--empty">Waiting...</span>
+          </div>
+        </div>
+
+        <div class="wizard__brief-footer" id="brief-footer" style="display: none;">
+          <button class="btn wizard__submit-btn" id="submit-brief">Submit Brief</button>
+          <p class="wizard__brief-note">We'll get back to you within 24 hours</p>
+        </div>
+      </div>
+      </div> <!-- /rift-wrap--subtle -->
+
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style is:global>
+  /* ═══════════════════════════════════════════
+     AI CONTACT WIZARD
+     ═══════════════════════════════════════════ */
+
+  .wizard-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 1rem 2rem;
+  }
+
+  .wizard {
+    width: 100%;
+    max-width: 960px;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 1.5rem;
+    height: calc(100vh - 7rem);
+    max-height: 720px;
+  }
+
+  /* ── Chat Side ── */
+
+  .wizard__chat {
+    display: flex;
+    flex-direction: column;
+    /* Visual effects handled by .rift-panel in theme.css */
+  }
+
+  .wizard__chat-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-card);
+    background: var(--bg-darker);
+  }
+
+  .wizard__status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cream);
+  }
+
+  .wizard__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+    animation: wizardDotPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes wizardDotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .wizard__subtitle {
+    font-size: 0.8rem;
+    color: var(--cream-faint);
+    margin-top: 0.25rem;
+  }
+
+  .wizard__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-dim) transparent;
+  }
+
+  .wizard__messages::-webkit-scrollbar { width: 4px; }
+  .wizard__messages::-webkit-scrollbar-track { background: transparent; }
+  .wizard__messages::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 2px; }
+
+  .wiz-msg {
+    max-width: 85%;
+    animation: wizMsgIn 0.3s ease-out;
+  }
+
+  .wiz-msg--user { align-self: flex-end; }
+  .wiz-msg--ai { align-self: flex-start; }
+
+  .wiz-msg__text {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+  }
+
+  .wiz-msg--user .wiz-msg__text {
+    background: rgba(200, 149, 42, 0.15);
+    color: var(--cream);
+    border-bottom-right-radius: 4px;
+  }
+
+  .wiz-msg--ai .wiz-msg__text {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(200, 149, 42, 0.12);
+    color: var(--text-body);
+    border-bottom-left-radius: 4px;
+  }
+
+  @keyframes wizMsgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .wiz-typing {
+    display: flex;
+    gap: 4px;
+    padding: 0.625rem 1rem;
+    align-self: flex-start;
+  }
+
+  .wiz-typing__dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.4;
+    animation: wizTypingBounce 1.4s ease-in-out infinite;
+  }
+
+  .wiz-typing__dot:nth-child(2) { animation-delay: 0.2s; }
+  .wiz-typing__dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes wizTypingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* ── Input Area ── */
+
+  .wizard__input-area {
+    padding: 0.875rem 1.25rem;
+    border-top: 1px solid var(--border-card);
+    background: var(--bg-darker);
+    min-height: 64px;
+  }
+
+  .wizard__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .wizard__opt {
+    background: rgba(200, 149, 42, 0.08);
+    border: 1px solid rgba(200, 149, 42, 0.2);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .wizard__opt:hover {
+    background: rgba(200, 149, 42, 0.18);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .wizard__text-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .wizard__input {
+    flex: 1;
+    background: rgba(244, 237, 221, 0.04);
+    border: 1px solid var(--border-card);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .wizard__input::placeholder { color: var(--cream-faint); }
+  .wizard__input:focus { border-color: var(--accent); }
+
+  .wizard__send {
+    background: var(--accent);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 8px;
+    width: 40px; height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .wizard__send:hover { background: var(--accent-bright); transform: scale(1.05); }
+
+  /* ── Brief Side ── */
+
+  .wizard__brief {
+    display: flex;
+    flex-direction: column;
+    /* Visual effects handled by .rift-panel--subtle in theme.css */
+  }
+
+  .wizard__brief-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-card);
+    background: var(--bg-darker);
+  }
+
+  .wizard__brief-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--cream);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .wizard__brief-progress {
+    height: 3px;
+    background: rgba(244, 237, 221, 0.08);
+    border-radius: 2px;
+    margin-top: 0.75rem;
+    overflow: hidden;
+  }
+
+  .wizard__brief-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+    border-radius: 2px;
+    transition: width 0.6s var(--ease-out-expo);
+  }
+
+  .wizard__brief-step {
+    font-size: 0.72rem;
+    color: var(--cream-faint);
+    margin-top: 0.4rem;
+    display: block;
+  }
+
+  .wizard__brief-body {
+    flex: 1;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+  }
+
+  .brief-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .brief-field__label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .brief-field__value {
+    font-size: 0.85rem;
+    color: var(--cream);
+    line-height: 1.5;
+  }
+
+  .brief-field__value--empty {
+    color: var(--cream-faint);
+    font-style: italic;
+    opacity: 0.5;
+  }
+
+  .brief-field__value--filled {
+    animation: briefFillIn 0.4s ease-out;
+  }
+
+  @keyframes briefFillIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .wizard__brief-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--border-card);
+    background: var(--bg-darker);
+    text-align: center;
+  }
+
+  .wizard__submit-btn {
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
+    padding: 0.8rem 2rem;
+  }
+
+  .wizard__brief-note {
+    font-size: 0.72rem;
+    color: var(--cream-faint);
+    margin-top: 0.5rem;
+  }
+
+  /* ── Success State ── */
+
+  .wizard__success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    gap: 1rem;
+    animation: wizMsgIn 0.5s ease-out;
+  }
+
+  .wizard__success-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: rgba(74, 222, 128, 0.1);
+    border: 2px solid rgba(74, 222, 128, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+  }
+
+  .wizard__success h3 {
+    font-family: var(--font-display);
+    color: var(--cream);
+    margin: 0;
+  }
+
+  .wizard__success p {
+    color: var(--cream-faint);
+    font-size: 0.88rem;
+  }
+
+  /* ── Mobile: stack layout ── */
+
+  @media (max-width: 768px) {
+    .wizard-page { padding: 4rem 0.5rem 1rem; }
+    .wizard {
+      grid-template-columns: 1fr;
+      max-height: none;
+      height: auto;
+      gap: 1rem;
+    }
+    .wizard__chat {
+      height: 60vh;
+      min-height: 400px;
+    }
+    .wizard__brief {
+      max-height: 50vh;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .wizard-page { padding: 4rem 0.25rem 0.5rem; }
+    .wizard__chat-header { padding: 1rem 1.25rem; }
+    .wizard__messages { padding: 1rem; }
+    .wizard__input-area { padding: 0.75rem 1rem; }
+    .wizard__opt { font-size: 0.78rem; padding: 0.4rem 0.85rem; }
+  }
+</style>
+
+<script>
+  // ═══════════════════════════════════════════
+  // AI CONTACT WIZARD
+  // ═══════════════════════════════════════════
+
+  function clearChildren(el: HTMLElement) {
+    while (el.firstChild) el.removeChild(el.firstChild);
+  }
+
+  interface WizardStep {
+    key: string;
+    question: string;
+    type: 'options' | 'text' | 'textarea';
+    options?: string[];
+    placeholder?: string;
+    briefField: string;
+    validation?: (val: string) => boolean;
+    followUp?: (val: string) => string;
+  }
+
+  const STEPS: WizardStep[] = [
+    {
+      key: 'name',
+      question: "Hi! I'm here to help you put together a project brief. First \u2014 what's your name?",
+      type: 'text',
+      placeholder: 'Your name',
+      briefField: 'brief-name',
+      validation: (v) => v.length >= 2,
+    },
+    {
+      key: 'email',
+      question: "Nice to meet you, {name}! What's the best email to reach you at?",
+      type: 'text',
+      placeholder: 'your@email.com',
+      briefField: 'brief-email',
+      validation: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+    },
+    {
+      key: 'project',
+      question: "What kind of project are you looking for?",
+      type: 'options',
+      options: ['New Website', 'Website Redesign', 'E-Commerce Store', 'AI / Chatbot Integration', 'Something Else'],
+      briefField: 'brief-project',
+      followUp: (v) => {
+        const responses: Record<string, string> = {
+          'New Website': "A fresh build \u2014 love it. We'll make something special.",
+          'Website Redesign': "Smart move. A modern refresh can transform your business.",
+          'E-Commerce Store': "Great choice. Stripe + custom cart = a premium shopping experience.",
+          'AI / Chatbot Integration': "You're in the right place! AI is what sets us apart.",
+          'Something Else': "Interesting! We love unique projects.",
+        };
+        return responses[v] || "Sounds great!";
+      }
+    },
+    {
+      key: 'budget',
+      question: "What's your approximate budget range?",
+      type: 'options',
+      options: ['Under $2,000', '$2,000 \u2013 $5,000', '$5,000 \u2013 $10,000', '$10,000+', 'Not sure yet'],
+      briefField: 'brief-budget',
+      followUp: (v) => {
+        if (v === 'Not sure yet') return "No worries \u2014 we can help you figure that out based on what you need.";
+        return "Good to know. We'll scope the project to deliver maximum value within that range.";
+      }
+    },
+    {
+      key: 'timeline',
+      question: "When are you hoping to launch?",
+      type: 'options',
+      options: ['ASAP', '1-2 months', '3-6 months', 'No rush \u2014 just exploring'],
+      briefField: 'brief-timeline',
+      followUp: (v) => {
+        if (v === 'ASAP') return "We can fast-track! Let's make it happen.";
+        if (v.includes('just exploring')) return "No pressure at all. Let's get the details down so we're ready when you are.";
+        return "That's a comfortable timeline. We'll build in review stages so you're never surprised.";
+      }
+    },
+    {
+      key: 'details',
+      question: "Last one \u2014 anything else you'd like us to know? Describe your vision, reference sites, features you want... go wild.",
+      type: 'textarea',
+      placeholder: 'Tell us about your vision...',
+      briefField: 'brief-details',
+    }
+  ];
+
+  const messagesEl = document.getElementById('wizard-messages') as HTMLDivElement;
+  const inputArea = document.getElementById('wizard-input-area') as HTMLDivElement;
+  const briefBar = document.getElementById('brief-bar') as HTMLDivElement;
+  const briefStepEl = document.getElementById('brief-step') as HTMLSpanElement;
+  const briefFooter = document.getElementById('brief-footer') as HTMLDivElement;
+  const submitBriefBtn = document.getElementById('submit-brief') as HTMLButtonElement;
+
+  const briefData: Record<string, string> = {};
+  let currentStep = 0;
+  let isProcessing = false;
+
+  function addAIMessage(text: string): Promise<void> {
+    return new Promise((resolve) => {
+      const msg = document.createElement('div');
+      msg.classList.add('wiz-msg', 'wiz-msg--ai');
+      const textEl = document.createElement('div');
+      textEl.classList.add('wiz-msg__text');
+      msg.appendChild(textEl);
+      messagesEl.appendChild(msg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      let i = 0;
+      const speed = text.length > 120 ? 12 : 20;
+      function type() {
+        if (i < text.length) {
+          textEl.textContent = (textEl.textContent || '') + text[i];
+          i++;
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+          setTimeout(type, speed);
+        } else { resolve(); }
+      }
+      type();
+    });
+  }
+
+  function addUserMessage(text: string) {
+    const msg = document.createElement('div');
+    msg.classList.add('wiz-msg', 'wiz-msg--user');
+    const textEl = document.createElement('div');
+    textEl.classList.add('wiz-msg__text');
+    textEl.textContent = text;
+    msg.appendChild(textEl);
+    messagesEl.appendChild(msg);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showTyping(): HTMLDivElement {
+    const typing = document.createElement('div');
+    typing.classList.add('wiz-typing');
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement('div');
+      dot.classList.add('wiz-typing__dot');
+      typing.appendChild(dot);
+    }
+    messagesEl.appendChild(typing);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return typing;
+  }
+
+  function updateBrief(fieldId: string, value: string) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    const valueEl = field.querySelector('.brief-field__value');
+    if (!valueEl) return;
+    valueEl.textContent = value;
+    valueEl.classList.remove('brief-field__value--empty');
+    valueEl.classList.add('brief-field__value--filled');
+  }
+
+  function updateProgress() {
+    const pct = ((currentStep) / STEPS.length) * 100;
+    briefBar.style.width = pct + '%';
+    briefStepEl.textContent = 'Step ' + Math.min(currentStep + 1, STEPS.length) + ' of ' + STEPS.length;
+  }
+
+  function showOptions(options: string[]) {
+    clearChildren(inputArea);
+    const wrap = document.createElement('div');
+    wrap.classList.add('wizard__options');
+
+    options.forEach((label, i) => {
+      const btn = document.createElement('button');
+      btn.classList.add('wizard__opt');
+      btn.textContent = label;
+      btn.style.opacity = '0';
+      btn.style.transform = 'translateY(8px)';
+      wrap.appendChild(btn);
+
+      setTimeout(() => {
+        btn.style.transition = 'all 0.3s ease';
+        btn.style.opacity = '1';
+        btn.style.transform = 'translateY(0)';
+      }, i * 80);
+
+      btn.addEventListener('click', () => handleAnswer(label));
+    });
+
+    inputArea.appendChild(wrap);
+  }
+
+  function showTextInput(placeholder: string, isTextarea = false) {
+    clearChildren(inputArea);
+    const wrap = document.createElement('div');
+    wrap.classList.add('wizard__text-input');
+
+    let input: HTMLInputElement | HTMLTextAreaElement;
+    if (isTextarea) {
+      input = document.createElement('textarea') as HTMLTextAreaElement;
+      input.rows = 3;
+      input.style.resize = 'none';
+    } else {
+      input = document.createElement('input') as HTMLInputElement;
+      input.type = 'text';
+    }
+    input.classList.add('wizard__input');
+    input.placeholder = placeholder;
+    input.maxLength = isTextarea ? 1000 : 200;
+    input.autocomplete = 'off';
+
+    const sendBtn = document.createElement('button');
+    sendBtn.classList.add('wizard__send');
+    sendBtn.setAttribute('aria-label', 'Send');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '16');
+    svg.setAttribute('height', '16');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '2.5');
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', '22'); line.setAttribute('y1', '2');
+    line.setAttribute('x2', '11'); line.setAttribute('y2', '13');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    poly.setAttribute('points', '22 2 15 22 11 13 2 9 22 2');
+    svg.appendChild(line);
+    svg.appendChild(poly);
+    sendBtn.appendChild(svg);
+
+    wrap.appendChild(input);
+    wrap.appendChild(sendBtn);
+    inputArea.appendChild(wrap);
+
+    const submit = () => {
+      const val = input.value.trim();
+      if (!val) return;
+      const step = STEPS[currentStep];
+      if (step.validation && !step.validation(val)) {
+        input.style.borderColor = '#ef4444';
+        setTimeout(() => { input.style.borderColor = ''; }, 1500);
+        return;
+      }
+      handleAnswer(val);
+    };
+
+    sendBtn.addEventListener('click', submit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submit();
+      }
+    });
+
+    setTimeout(() => input.focus(), 100);
+  }
+
+  async function handleAnswer(value: string) {
+    if (isProcessing) return;
+    isProcessing = true;
+
+    const step = STEPS[currentStep];
+
+    // Show user message
+    addUserMessage(value);
+
+    // Update brief
+    briefData[step.key] = value;
+    updateBrief(step.briefField, value);
+
+    // Clear input area temporarily
+    clearChildren(inputArea);
+
+    // Show typing indicator
+    const typing = showTyping();
+
+    // Simulate AI thinking
+    await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+    typing.remove();
+
+    // Show follow-up comment if exists
+    if (step.followUp) {
+      const comment = step.followUp(value);
+      await addAIMessage(comment);
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    // Move to next step
+    currentStep++;
+    updateProgress();
+
+    if (currentStep < STEPS.length) {
+      // Show next question
+      const nextStep = STEPS[currentStep];
+      let question = nextStep.question;
+      // Replace placeholders
+      question = question.replace('{name}', briefData['name'] || '');
+
+      const typingNext = showTyping();
+      await new Promise(r => setTimeout(r, 400));
+      typingNext.remove();
+
+      await addAIMessage(question);
+
+      // Show appropriate input
+      if (nextStep.type === 'options' && nextStep.options) {
+        showOptions(nextStep.options);
+      } else {
+        showTextInput(nextStep.placeholder || 'Type here...', nextStep.type === 'textarea');
+      }
+    } else {
+      // All steps complete
+      await addAIMessage("That's everything I need! Your brief looks great. Take a look on the right and hit Submit when you're ready.");
+      briefBar.style.width = '100%';
+      briefStepEl.textContent = 'Complete!';
+      briefFooter.style.display = 'block';
+      briefFooter.style.animation = 'wizMsgIn 0.4s ease-out';
+    }
+
+    isProcessing = false;
+  }
+
+  // ── Submit handler ──
+  submitBriefBtn.addEventListener('click', async () => {
+    submitBriefBtn.disabled = true;
+    submitBriefBtn.textContent = 'Sending...';
+
+    // Simulate submission (in production, POST to /api/contact)
+    await new Promise(r => setTimeout(r, 1500));
+
+    // Show success in chat
+    await addAIMessage("Brief submitted! We'll review everything and get back to you within 24 hours. Thanks, " + (briefData['name'] || 'friend') + "!");
+
+    // Replace brief body with success state
+    const briefBody = document.getElementById('brief-body') as HTMLDivElement;
+    briefFooter.style.display = 'none';
+
+    clearChildren(briefBody);
+
+    const success = document.createElement('div');
+    success.classList.add('wizard__success');
+
+    const icon = document.createElement('div');
+    icon.classList.add('wizard__success-icon');
+    icon.textContent = '\u2713';
+
+    const h3 = document.createElement('h3');
+    h3.textContent = 'Brief Sent!';
+
+    const p = document.createElement('p');
+    p.textContent = "We'll be in touch within 24 hours with next steps.";
+
+    const link = document.createElement('a');
+    link.href = '/';
+    link.classList.add('btn');
+    link.style.marginTop = '0.5rem';
+    link.textContent = 'Back to Home';
+
+    success.appendChild(icon);
+    success.appendChild(h3);
+    success.appendChild(p);
+    success.appendChild(link);
+    briefBody.appendChild(success);
+  });
+
+  // ── Start the wizard ──
+  (async function initWizard() {
+    await new Promise(r => setTimeout(r, 800));
+    await addAIMessage(STEPS[0].question);
+    showTextInput(STEPS[0].placeholder || 'Type here...', STEPS[0].type === 'textarea');
+    updateProgress();
+  })();
+</script>

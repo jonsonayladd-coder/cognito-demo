@@ -1,0 +1,87 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About — Client Name" description="Learn more about our team, mission, and what drives us.">
+
+  <header class="doc-header">
+    <p class="section-label" data-letter-stagger>About Us</p>
+    <h1>Who We Are</h1>
+    <p class="tagline">Crafting digital experiences since 2014</p>
+    <hr class="accent-rule">
+  </header>
+
+  <!-- Mission -->
+  <section class="section" data-reveal>
+    <h2>Our Mission</h2>
+    <hr class="accent-rule">
+    <div class="prose">
+      <p>We believe great websites are more than pretty pages. They're tools that solve problems, drive growth, and create genuine connections between businesses and their audiences.</p>
+      <p>Every project starts with understanding what you actually need — not what's trendy, not what's flashy for the sake of it, but what moves the needle for your business.</p>
+    </div>
+  </section>
+
+  <!-- What We Do -->
+  <section class="section" data-reveal>
+    <p class="section-label" data-letter-stagger>Our Approach</p>
+    <h2>How We Work</h2>
+    <hr class="accent-rule">
+
+    <div class="cards" data-stagger>
+      <div class="card">
+        <h4>Discovery</h4>
+        <p>We start by understanding your business, your audience, and your goals. No cookie-cutter solutions.</p>
+      </div>
+      <div class="card">
+        <h4>Design</h4>
+        <p>Clean, purposeful design that reflects your brand and guides users toward action.</p>
+      </div>
+      <div class="card">
+        <h4>Build</h4>
+        <p>Modern tech stack, blazing fast performance, deployed on global edge networks.</p>
+      </div>
+      <div class="card">
+        <h4>Launch & Support</h4>
+        <p>We don't disappear after launch. Ongoing support, updates, and optimization.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Highlight -->
+  <section class="section" data-reveal-scale>
+    <div class="highlight-box">
+      <div class="highlight-box__value">Built Different</div>
+      <p>Every site is custom-built from scratch. No WordPress themes, no page builders, no compromises.</p>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section class="section" data-reveal>
+    <p class="section-label" data-letter-stagger>Technology</p>
+    <h2>Our Stack</h2>
+    <hr class="accent-rule">
+
+    <div class="tag-row" data-stagger>
+      <span class="tag">Astro 5</span>
+      <span class="tag">Solid.js</span>
+      <span class="tag">Cloudflare Pages</span>
+      <span class="tag">Workers AI</span>
+      <span class="tag">D1 Database</span>
+      <span class="tag">Stripe</span>
+      <span class="tag">GSAP</span>
+      <span class="tag">Three.js</span>
+      <span class="tag">TypeScript</span>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" data-reveal-scale>
+    <div class="cta-block">
+      <p class="section-label">Let's Talk</p>
+      <h2>Ready to Start Your Project?</h2>
+      <p class="tagline">We'd love to hear about what you're building</p>
+      <a href="/contact" class="btn">Get In Touch</a>
+    </div>
+  </section>
+
+</BaseLayout>

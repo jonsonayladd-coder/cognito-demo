@@ -1,0 +1,1195 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Client Name — Premium Web Experience" description="A premium dark-theme website with WebGL effects, AI-powered interactions, and modern design." navAlwaysVisible={true}>
+
+  <!-- ═══════════════════════════════════════════
+       1. AI CONCIERGE HERO
+       ═══════════════════════════════════════════ -->
+  <section class="landing-hero">
+    <div style="text-align: center;">
+      <p class="section-label" data-letter-stagger>Welcome &middot; 2026</p>
+      <h1 class="landing-hero__title glow-text">Client Name</h1>
+      <p class="landing-hero__sub">Your tagline goes here</p>
+      <p class="landing-hero__name">Location, Country</p>
+
+      <!-- AI Concierge -->
+      <div class="concierge" id="concierge" data-reveal-scale>
+        <div class="concierge__bubble" id="concierge-bubble">
+          <div class="concierge__dot"></div>
+          <span class="concierge__text" id="concierge-text"></span>
+        </div>
+        <div class="concierge__options" id="concierge-options">
+          <!-- Options injected by JS -->
+        </div>
+        <div class="concierge__input-wrap" id="concierge-input-wrap" style="display: none;">
+          <input type="text" class="concierge__input" id="concierge-input" placeholder="Tell me more..." maxlength="200" autocomplete="off">
+          <button class="concierge__send" id="concierge-send" aria-label="Send">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="scroll-hint" style="margin-top: 2rem;">
+        <span class="scroll-hint__arrow"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SERVICES SECTION
+       ═══════════════════════════════════════════ -->
+  <section class="section" id="services" data-reveal>
+    <p class="section-label" data-letter-stagger>What We Do</p>
+    <h2>Our Services</h2>
+    <hr class="accent-rule">
+
+    <div class="cards" data-stagger>
+      <div class="card card--gold-left">
+        <h4>Web Development</h4>
+        <p>Custom websites built with modern frameworks. Fast, accessible, and beautiful.</p>
+        <div class="tag-row">
+          <span class="tag">Astro</span>
+          <span class="tag">Cloudflare</span>
+          <span class="tag">SSR</span>
+        </div>
+      </div>
+      <div class="card card--gold-left">
+        <h4>AI Integration</h4>
+        <p>Smart chatbots and AI-powered features that enhance your customer experience.</p>
+        <div class="tag-row">
+          <span class="tag">Workers AI</span>
+          <span class="tag">Chatbots</span>
+          <span class="tag">Automation</span>
+        </div>
+      </div>
+      <div class="card card--gold-left">
+        <h4>E-Commerce</h4>
+        <p>Online stores with secure payments, inventory management, and analytics.</p>
+        <div class="tag-row">
+          <span class="tag">Stripe</span>
+          <span class="tag">Custom Cart</span>
+          <span class="tag">Analytics</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       STATS
+       ═══════════════════════════════════════════ -->
+  <section class="section" id="stats" data-reveal>
+    <p class="section-label" data-letter-stagger>By The Numbers</p>
+    <h2>What We've Achieved</h2>
+    <hr class="accent-rule">
+
+    <div class="stats" data-stagger>
+      <div class="stat">
+        <span class="stat__number" data-count="150" data-count-suffix="+">0</span>
+        <span class="stat__label">Projects Delivered</span>
+      </div>
+      <div class="stat stat--highlight">
+        <span class="stat__number" data-count="98" data-count-suffix="%">0</span>
+        <span class="stat__label">Client Satisfaction</span>
+      </div>
+      <div class="stat">
+        <span class="stat__number" data-count="12">0</span>
+        <span class="stat__label">Years Experience</span>
+      </div>
+      <div class="stat">
+        <span class="stat__number" data-count="24" data-count-suffix="/7">0</span>
+        <span class="stat__label">Support Available</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       5. INLINE AI DEMO
+       ═══════════════════════════════════════════ -->
+  <section class="section" id="ai-demo" data-reveal-scale>
+    <div class="ai-demo">
+      <div class="ai-demo__header">
+        <p class="section-label">Try It Now</p>
+        <h2>AI That Knows Your Business</h2>
+        <p class="tagline">Every site we build can have a smart assistant trained on your business. Go ahead — ask it something.</p>
+      </div>
+
+      <div class="ai-demo__chat" id="ai-demo-chat">
+        <div class="ai-demo__messages" id="demo-messages">
+          <!-- Messages inserted by JS -->
+        </div>
+        <div class="ai-demo__suggestions" id="demo-suggestions">
+          <button class="ai-demo__chip" data-question="What services do you offer?">What services do you offer?</button>
+          <button class="ai-demo__chip" data-question="How much does a website cost?">How much does a website cost?</button>
+          <button class="ai-demo__chip" data-question="How long does a project take?">How long does a project take?</button>
+        </div>
+        <div class="ai-demo__input-area">
+          <input type="text" id="demo-input" class="ai-demo__input" placeholder="Ask anything..." maxlength="300" autocomplete="off">
+          <button id="demo-send" class="ai-demo__send" aria-label="Send">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CHATBOT FEATURES — TILTING CARD
+       ═══════════════════════════════════════════ -->
+  <section class="section" id="chatbot-features" data-reveal>
+    <p class="section-label" data-letter-stagger>Under the Hood</p>
+    <h2>AI That's Built Different</h2>
+    <p class="tagline">This isn't a basic chatbot widget. It's a production-grade conversational AI with enterprise-level safeguards — built right into the site.</p>
+    <hr class="accent-rule">
+
+    <div class="tilt-card" id="tilt-card">
+      <div class="tilt-card__inner">
+        <div class="tilt-card__glow"></div>
+
+        <div class="tilt-card__header">
+          <div class="tilt-card__icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
+              <path d="M16 14H8a4 4 0 0 0-4 4v2h16v-2a4 4 0 0 0-4-4z"/>
+              <circle cx="12" cy="6" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="tilt-card__title">Qwen 3 · 30B Parameters</h3>
+            <p class="tilt-card__subtitle">Running on Cloudflare Workers AI — edge inference in every region</p>
+          </div>
+        </div>
+
+        <div class="tilt-card__features">
+          <div class="tilt-card__feature">
+            <span class="tilt-card__feature-icon">⚡</span>
+            <div>
+              <strong>Instant FAQ Matching</strong>
+              <p>Common questions get instant answers with zero AI tokens. Pricing, services, timelines — answered in milliseconds, not seconds.</p>
+            </div>
+          </div>
+
+          <div class="tilt-card__feature">
+            <span class="tilt-card__feature-icon">🛡</span>
+            <div>
+              <strong>Adversarial Hardened</strong>
+              <p>Prompt injection, persona hijacking, jailbreaks — tested and sealed. The bot stays on-brand no matter what users throw at it.</p>
+            </div>
+          </div>
+
+          <div class="tilt-card__feature">
+            <span class="tilt-card__feature-icon">🧠</span>
+            <div>
+              <strong>Session Memory</strong>
+              <p>Conversations persist across page reloads. Users pick up right where they left off — no repeating themselves.</p>
+            </div>
+          </div>
+
+          <div class="tilt-card__feature">
+            <span class="tilt-card__feature-icon">📬</span>
+            <div>
+              <strong>Lead Capture</strong>
+              <p>When a user says "I'm ready to start," the bot captures their intent and stores the conversation for follow-up. No forms needed.</p>
+            </div>
+          </div>
+
+          <div class="tilt-card__feature">
+            <span class="tilt-card__feature-icon">🚦</span>
+            <div>
+              <strong>Rate Limiting</strong>
+              <p>KV-backed per-IP throttling prevents abuse. 20 requests per minute with graceful messaging — no hard errors.</p>
+            </div>
+          </div>
+
+          <div class="tilt-card__feature">
+            <span class="tilt-card__feature-icon">🧹</span>
+            <div>
+              <strong>Clean Output</strong>
+              <p>Qwen 3's internal thinking tokens are stripped before delivery. Users see polished responses, never raw reasoning artifacts.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tilt-card__footer">
+          <a href="/chat" class="btn btn--sm">Try the Chat</a>
+          <span class="tilt-card__tech">Astro 6 · Cloudflare Workers AI · KV · TypeScript</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       3. SMART FAQ
+       ═══════════════════════════════════════════ -->
+  <section class="section" id="faq" data-reveal>
+    <p class="section-label" data-letter-stagger>Questions?</p>
+    <h2>Smart FAQ</h2>
+    <p class="tagline">Click a question or ask your own — powered by AI.</p>
+    <hr class="accent-rule">
+
+    <div class="smart-faq">
+      <div class="smart-faq__questions" id="faq-questions">
+        <button class="smart-faq__q" data-faq="What's included in a website project?">
+          <span class="smart-faq__icon">?</span>
+          What's included in a website project?
+        </button>
+        <button class="smart-faq__q" data-faq="Do you offer ongoing support after launch?">
+          <span class="smart-faq__icon">?</span>
+          Do you offer ongoing support after launch?
+        </button>
+        <button class="smart-faq__q" data-faq="Can you add AI features to my existing site?">
+          <span class="smart-faq__icon">?</span>
+          Can you add AI features to my existing site?
+        </button>
+      </div>
+      <div class="smart-faq__answer" id="faq-answer">
+        <div class="smart-faq__placeholder">Click a question above or type your own below</div>
+      </div>
+      <div class="smart-faq__custom">
+        <input type="text" id="faq-input" class="smart-faq__input" placeholder="Ask something else..." maxlength="200" autocomplete="off">
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CTA
+       ═══════════════════════════════════════════ -->
+  <section class="section" data-reveal-scale>
+    <div class="cta-block">
+      <p class="section-label">Ready to Start?</p>
+      <h2>Let's Build Something Great</h2>
+      <p class="tagline">Get in touch to discuss your project</p>
+      <a href="/contact" class="btn">Contact Us</a>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style is:global>
+  /* ═══════════════════════════════════════════
+     AI CONCIERGE (Hero)
+     ═══════════════════════════════════════════ */
+  .concierge {
+    margin-top: 2.5rem;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .concierge__bubble {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    justify-content: center;
+    padding: 0.875rem 1.5rem;
+    background: rgba(18, 16, 12, 0.7);
+    border: 1px solid var(--border-card);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    margin-bottom: 1rem;
+    min-height: 52px;
+  }
+
+  .concierge__dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+    flex-shrink: 0;
+    animation: concDotPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes concDotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .concierge__text {
+    font-size: 0.9rem;
+    color: var(--cream);
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  .concierge__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .concierge__opt {
+    padding: 0.6rem 1.25rem;
+    border: 1px solid var(--border-card);
+    border-radius: 20px;
+    background: rgba(18, 16, 12, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--cream-muted);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .concierge__opt:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 20px rgba(200,149,42,0.15);
+    transform: translateY(-2px);
+  }
+
+  .concierge__input-wrap {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .concierge__input {
+    flex: 1;
+    background: rgba(244, 237, 221, 0.04);
+    border: 1px solid var(--border-card);
+    border-radius: 20px;
+    padding: 0.6rem 1rem;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .concierge__input::placeholder { color: var(--cream-faint); }
+  .concierge__input:focus { border-color: var(--accent); }
+
+  .concierge__send {
+    background: var(--accent);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 50%;
+    width: 38px; height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .concierge__send:hover { background: var(--accent-bright); transform: scale(1.08); }
+
+  /* Concierge response */
+  .concierge__response {
+    margin-top: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    background: rgba(18, 16, 12, 0.7);
+    border: 1px solid rgba(200, 149, 42, 0.15);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: concFadeIn 0.4s ease-out;
+  }
+
+  .concierge__response-text {
+    font-size: 0.85rem;
+    color: var(--text-body);
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .concierge__response-action {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .concierge__response-action:hover {
+    background: rgba(200,149,42,0.15);
+    box-shadow: 0 0 15px rgba(200,149,42,0.15);
+  }
+
+  @keyframes concFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ═══════════════════════════════════════════
+     INLINE AI DEMO
+     ═══════════════════════════════════════════ */
+  .ai-demo {
+    background: rgba(18, 16, 12, 0.5);
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: relative;
+  }
+
+  /* Rotating border */
+  .ai-demo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), transparent 25%, var(--accent) 50%, transparent 75%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: rotateBorder 4s linear infinite;
+    pointer-events: none;
+  }
+
+  .ai-demo__header {
+    padding: 2rem 2rem 1rem;
+    text-align: center;
+  }
+
+  .ai-demo__chat {
+    padding: 0 2rem 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ai-demo__messages {
+    min-height: 80px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-dim) transparent;
+  }
+
+  .ai-demo__messages::-webkit-scrollbar { width: 3px; }
+  .ai-demo__messages::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 2px; }
+
+  .ai-demo__msg {
+    max-width: 85%;
+    animation: chatMsgIn 0.3s ease-out;
+  }
+
+  .ai-demo__msg--user { align-self: flex-end; }
+  .ai-demo__msg--ai { align-self: flex-start; }
+
+  .ai-demo__msg-text {
+    padding: 0.625rem 0.875rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    word-wrap: break-word;
+  }
+
+  .ai-demo__msg--user .ai-demo__msg-text {
+    background: rgba(200, 149, 42, 0.15);
+    color: var(--cream);
+    border-bottom-right-radius: 4px;
+  }
+
+  .ai-demo__msg--ai .ai-demo__msg-text {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(200, 149, 42, 0.12);
+    color: var(--text-body);
+    border-bottom-left-radius: 4px;
+  }
+
+  @keyframes chatMsgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ai-demo__suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+  }
+
+  .ai-demo__chip {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--border-card);
+    border-radius: 16px;
+    background: transparent;
+    color: var(--cream-faint);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .ai-demo__chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,149,42,0.08);
+  }
+
+  .ai-demo__input-area {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .ai-demo__input {
+    flex: 1;
+    background: rgba(244, 237, 221, 0.04);
+    border: 1px solid var(--border-card);
+    border-radius: 8px;
+    padding: 0.65rem 0.875rem;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .ai-demo__input::placeholder { color: var(--cream-faint); }
+  .ai-demo__input:focus { border-color: var(--accent); }
+
+  .ai-demo__send {
+    background: var(--accent);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 8px;
+    width: 38px; height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .ai-demo__send:hover { background: var(--accent-bright); transform: scale(1.05); }
+
+  /* Typing dots */
+  .ai-demo__typing {
+    display: flex;
+    gap: 4px;
+    padding: 0.5rem 0.875rem;
+    align-self: flex-start;
+  }
+
+  .ai-demo__typing-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.4;
+    animation: typingBounce 1.4s ease-in-out infinite;
+  }
+
+  .ai-demo__typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .ai-demo__typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* ═══════════════════════════════════════════
+     SMART FAQ
+     ═══════════════════════════════════════════ */
+  .smart-faq {
+    max-width: 640px;
+  }
+
+  .smart-faq__questions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .smart-faq__q {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.875rem 1.25rem;
+    border: 1px solid var(--border-card);
+    border-radius: 8px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .smart-faq__q:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(200,149,42,0.1);
+    transform: translateX(4px);
+  }
+
+  .smart-faq__q--active {
+    border-color: var(--accent);
+    background: rgba(200,149,42,0.08);
+  }
+
+  .smart-faq__icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .smart-faq__answer {
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border-card);
+    border-radius: 8px;
+    background: rgba(18, 16, 12, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    min-height: 80px;
+    margin-bottom: 1rem;
+  }
+
+  .smart-faq__placeholder {
+    color: var(--cream-faint);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  .smart-faq__answer-text {
+    color: var(--text-body);
+    font-size: 0.88rem;
+    line-height: 1.65;
+    animation: faqFadeIn 0.4s ease-out;
+  }
+
+  @keyframes faqFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .smart-faq__custom {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .smart-faq__input {
+    flex: 1;
+    background: rgba(244, 237, 221, 0.04);
+    border: 1px solid var(--border-card);
+    border-radius: 8px;
+    padding: 0.65rem 0.875rem;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .smart-faq__input::placeholder { color: var(--cream-faint); }
+  .smart-faq__input:focus { border-color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .ai-demo__chat { padding: 0 1rem 1rem; }
+    .ai-demo__header { padding: 1.5rem 1rem 0.75rem; }
+    .concierge__options { flex-direction: column; align-items: center; }
+  }
+
+  /* ═══════════════════════════════════════════
+     TILTING FEATURE CARD
+     ═══════════════════════════════════════════ */
+  .tilt-card {
+    max-width: 720px;
+    margin: 0 auto;
+    perspective: 1200px;
+  }
+
+  .tilt-card__inner {
+    position: relative;
+    background: rgba(18, 16, 12, 0.7);
+    border: 1px solid var(--border-card);
+    border-radius: 16px;
+    padding: 2.5rem;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 60px rgba(200,149,42,0.04);
+    overflow: hidden;
+  }
+
+  .tilt-card__inner:hover {
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 80px rgba(200,149,42,0.1);
+  }
+
+  .tilt-card__glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,149,42,0.15) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+  }
+
+  .tilt-card:hover .tilt-card__glow {
+    opacity: 1;
+  }
+
+  .tilt-card__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tilt-card__icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgba(200, 149, 42, 0.12);
+    border: 1px solid rgba(200, 149, 42, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .tilt-card__title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--cream);
+    margin: 0;
+  }
+
+  .tilt-card__subtitle {
+    font-size: 0.8rem;
+    color: var(--cream-faint);
+    margin-top: 0.15rem;
+  }
+
+  .tilt-card__features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tilt-card__feature {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .tilt-card__feature-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .tilt-card__feature strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.2rem;
+  }
+
+  .tilt-card__feature p {
+    font-size: 0.78rem;
+    color: var(--cream-muted);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .tilt-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-card);
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn--sm {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.78rem;
+  }
+
+  .tilt-card__tech {
+    font-size: 0.7rem;
+    color: var(--cream-faint);
+    letter-spacing: 0.05em;
+    font-family: var(--font-body);
+  }
+
+  @media (max-width: 640px) {
+    .tilt-card__inner { padding: 1.5rem; }
+    .tilt-card__features { grid-template-columns: 1fr; gap: 1rem; }
+    .tilt-card__footer { flex-direction: column; gap: 0.75rem; text-align: center; }
+    .tilt-card__header { flex-direction: column; text-align: center; }
+  }
+</style>
+
+<script>
+  // ═══════════════════════════════════════════════
+  // DEMO AI RESPONSES (no API needed — all scripted)
+  // Replace with real API calls per client
+  // ═══════════════════════════════════════════════
+
+  const DEMO_RESPONSES: Record<string, {text: string, action?: {label: string, href: string}}> = {
+    // Concierge
+    'services': {
+      text: "We build custom websites, AI-powered chatbots, and e-commerce stores — all on blazing fast infrastructure. Want me to show you some examples?",
+      action: { label: 'View Our Work', href: '/about' }
+    },
+    'pricing': {
+      text: "Projects typically range from $2,000 for a brochure site to $8,000+ for full e-commerce with AI. Every project is custom-scoped. Want to chat about yours?",
+      action: { label: 'Get a Quote', href: '/contact' }
+    },
+    'project': {
+      text: "Exciting! I'd love to hear about what you're building. Our contact wizard will help us understand exactly what you need.",
+      action: { label: 'Start Your Brief', href: '/contact' }
+    },
+    'browse': {
+      text: "Take your time! Scroll down to see our services, try the AI demo, or check out our work. I'm here if you need anything.",
+    },
+    // Inline demo
+    'What services do you offer?': {
+      text: "We specialize in three areas: custom web development with Astro and Cloudflare, AI integration (chatbots, smart forms, recommendation engines), and e-commerce with Stripe. Everything is built from scratch — no templates, no WordPress."
+    },
+    'How much does a website cost?': {
+      text: "It depends on complexity. A modern brochure site starts around $2,000. Add e-commerce and you're looking at $4,000-6,000. AI features like chatbots or smart forms add $1,500-3,000. We'll scope it precisely during the consultation — no surprises."
+    },
+    'How long does a project take?': {
+      text: "A standard site takes 2-4 weeks. E-commerce with AI features is typically 4-6 weeks. We work in stages — design, build, review, launch — so you see progress every step of the way."
+    },
+    // FAQ
+    "What's included in a website project?": {
+      text: "Every project includes: custom design, responsive development, SEO optimization, Cloudflare hosting setup, analytics integration, and a 30-day support window after launch. We don't just build and disappear."
+    },
+    'Do you offer ongoing support after launch?': {
+      text: "Yes! We offer monthly maintenance plans starting at $150/month that cover updates, security patches, content changes, and priority support. Most clients stay with us long-term."
+    },
+    'Can you add AI features to my existing site?': {
+      text: "Absolutely. We can integrate AI chatbots, smart contact forms, FAQ assistants, or product recommendation engines into any existing website. The AI runs on Cloudflare Workers, so it's fast and cost-effective."
+    }
+  };
+
+  function getDemoResponse(question: string): string {
+    const match = DEMO_RESPONSES[question];
+    if (match) return match.text;
+    // Fuzzy match
+    const lower = question.toLowerCase();
+    if (lower.includes('price') || lower.includes('cost') || lower.includes('much')) return DEMO_RESPONSES['pricing'].text;
+    if (lower.includes('service') || lower.includes('offer') || lower.includes('do you')) return DEMO_RESPONSES['services'].text;
+    if (lower.includes('time') || lower.includes('long') || lower.includes('fast')) return DEMO_RESPONSES['How long does a project take?'].text;
+    if (lower.includes('support') || lower.includes('maintenance')) return DEMO_RESPONSES['Do you offer ongoing support after launch?'].text;
+    if (lower.includes('ai') || lower.includes('chatbot') || lower.includes('existing')) return DEMO_RESPONSES['Can you add AI features to my existing site?'].text;
+    return "Great question! That's something we'd love to discuss in detail. Our team can give you a personalized answer — want to start a conversation?";
+  }
+
+  function typeText(el: HTMLElement, text: string, speed = 18): Promise<void> {
+    return new Promise((resolve) => {
+      let i = 0;
+      const finalSpeed = text.length > 150 ? 12 : speed;
+      function type() {
+        if (i < text.length) {
+          el.textContent = (el.textContent || '') + text[i];
+          i++;
+          setTimeout(type, finalSpeed);
+        } else { resolve(); }
+      }
+      type();
+    });
+  }
+
+  function createTypingDots(prefix: string): HTMLElement {
+    const typing = document.createElement('div');
+    typing.classList.add(`${prefix}__typing`);
+    for (let i = 0; i < 3; i++) {
+      const dot = document.createElement('div');
+      dot.classList.add(`${prefix}__typing-dot`);
+      typing.appendChild(dot);
+    }
+    return typing;
+  }
+
+  // ═══════════════════════════════════════════
+  // 1. AI CONCIERGE
+  // ═══════════════════════════════════════════
+  (function initConcierge() {
+    const textEl = document.getElementById('concierge-text')!;
+    const optionsEl = document.getElementById('concierge-options')!;
+    const inputWrap = document.getElementById('concierge-input-wrap')!;
+    const inputEl = document.getElementById('concierge-input') as HTMLInputElement;
+    const sendBtn = document.getElementById('concierge-send')!;
+
+    // Typewriter greeting
+    const greeting = "Hey there! What brings you here today?";
+    setTimeout(() => typeText(textEl, greeting, 25), 1800);
+
+    // Show options after greeting types
+    const options = [
+      { label: 'Explore services', key: 'services' },
+      { label: 'Get pricing', key: 'pricing' },
+      { label: 'Start a project', key: 'project' },
+      { label: 'Just browsing', key: 'browse' },
+    ];
+
+    setTimeout(() => {
+      options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.classList.add('concierge__opt');
+        btn.textContent = opt.label;
+        btn.style.opacity = '0';
+        btn.style.transform = 'translateY(10px)';
+        optionsEl.appendChild(btn);
+
+        setTimeout(() => {
+          btn.style.transition = 'all 0.4s var(--ease-out-expo)';
+          btn.style.opacity = '1';
+          btn.style.transform = 'translateY(0)';
+        }, i * 100);
+
+        btn.addEventListener('click', () => handleConciergeChoice(opt.key));
+      });
+    }, 1800 + greeting.length * 25 + 300);
+
+    function handleConciergeChoice(key: string) {
+      const data = DEMO_RESPONSES[key];
+      if (!data) return;
+
+      // Hide options
+      optionsEl.style.transition = 'opacity 0.3s ease';
+      optionsEl.style.opacity = '0';
+      setTimeout(() => { optionsEl.style.display = 'none'; }, 300);
+
+      // Show response
+      const response = document.createElement('div');
+      response.classList.add('concierge__response');
+
+      const respText = document.createElement('div');
+      respText.classList.add('concierge__response-text');
+      response.appendChild(respText);
+
+      if (data.action) {
+        const link = document.createElement('a');
+        link.classList.add('concierge__response-action');
+        link.href = data.action.href;
+        link.textContent = data.action.label;
+        link.style.opacity = '0';
+        response.appendChild(link);
+        setTimeout(() => { link.style.transition = 'opacity 0.4s ease'; link.style.opacity = '1'; }, data.text.length * 14 + 200);
+      }
+
+      const concierge = document.getElementById('concierge')!;
+      concierge.appendChild(response);
+
+      typeText(respText, data.text, 14);
+
+      // Show input for follow-up
+      setTimeout(() => {
+        inputWrap.style.display = 'flex';
+        inputWrap.style.animation = 'concFadeIn 0.4s ease-out';
+      }, data.text.length * 14 + 500);
+    }
+
+    function handleConciergeInput() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      inputEl.value = '';
+      const reply = getDemoResponse(text);
+
+      // Clear previous response
+      const prev = document.querySelector('.concierge__response');
+      if (prev) prev.remove();
+
+      handleConciergeChoice(
+        text.toLowerCase().includes('price') ? 'pricing' :
+        text.toLowerCase().includes('service') ? 'services' :
+        text.toLowerCase().includes('project') || text.toLowerCase().includes('start') ? 'project' : 'browse'
+      );
+    }
+
+    sendBtn.addEventListener('click', handleConciergeInput);
+    inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConciergeInput(); });
+  })();
+
+  // ═══════════════════════════════════════════
+  // 5. INLINE AI DEMO
+  // ═══════════════════════════════════════════
+  (function initInlineDemo() {
+    const messagesEl = document.getElementById('demo-messages')!;
+    const suggestionsEl = document.getElementById('demo-suggestions')!;
+    const inputEl = document.getElementById('demo-input') as HTMLInputElement;
+    const sendBtn = document.getElementById('demo-send')!;
+    let busy = false;
+
+    function addDemoMsg(text: string, role: 'user' | 'ai', animate = true) {
+      const msg = document.createElement('div');
+      msg.classList.add('ai-demo__msg', `ai-demo__msg--${role}`);
+      const textEl = document.createElement('div');
+      textEl.classList.add('ai-demo__msg-text');
+      msg.appendChild(textEl);
+      messagesEl.appendChild(msg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      if (role === 'ai' && animate) {
+        typeText(textEl, text, 14).then(() => { busy = false; inputEl.disabled = false; });
+      } else {
+        textEl.textContent = text;
+      }
+    }
+
+    async function askDemo(question: string) {
+      if (busy) return;
+      busy = true;
+      inputEl.disabled = true;
+
+      // Hide suggestions after first use
+      suggestionsEl.style.transition = 'opacity 0.3s ease, height 0.3s ease';
+      suggestionsEl.style.opacity = '0';
+      setTimeout(() => { suggestionsEl.style.display = 'none'; }, 300);
+
+      addDemoMsg(question, 'user');
+
+      // Typing indicator
+      const typing = createTypingDots('ai-demo');
+      messagesEl.appendChild(typing);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      await new Promise(r => setTimeout(r, 800 + Math.random() * 600));
+      typing.remove();
+
+      const reply = getDemoResponse(question);
+      addDemoMsg(reply, 'ai');
+    }
+
+    // Chip clicks
+    suggestionsEl.querySelectorAll('.ai-demo__chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const q = (chip as HTMLElement).dataset.question || '';
+        askDemo(q);
+      });
+    });
+
+    // Manual input
+    function handleDemoInput() {
+      const text = inputEl.value.trim();
+      if (!text || busy) return;
+      inputEl.value = '';
+      askDemo(text);
+    }
+
+    sendBtn.addEventListener('click', handleDemoInput);
+    inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleDemoInput(); });
+  })();
+
+  // ═══════════════════════════════════════════
+  // 3. SMART FAQ
+  // ═══════════════════════════════════════════
+  (function initSmartFAQ() {
+    const answerEl = document.getElementById('faq-answer')!;
+    const inputEl = document.getElementById('faq-input') as HTMLInputElement;
+    const questions = document.querySelectorAll('.smart-faq__q');
+
+    function showAnswer(question: string, btn?: HTMLElement) {
+      // Highlight active button
+      questions.forEach(q => q.classList.remove('smart-faq__q--active'));
+      if (btn) btn.classList.add('smart-faq__q--active');
+
+      // Clear and show answer
+      answerEl.textContent = '';
+      const textEl = document.createElement('div');
+      textEl.classList.add('smart-faq__answer-text');
+      answerEl.appendChild(textEl);
+
+      const reply = getDemoResponse(question);
+      typeText(textEl, reply, 14);
+    }
+
+    questions.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const q = (btn as HTMLElement).dataset.faq || '';
+        showAnswer(q, btn as HTMLElement);
+      });
+    });
+
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const text = inputEl.value.trim();
+        if (!text) return;
+        inputEl.value = '';
+        questions.forEach(q => q.classList.remove('smart-faq__q--active'));
+        answerEl.textContent = '';
+        const textEl = document.createElement('div');
+        textEl.classList.add('smart-faq__answer-text');
+        answerEl.appendChild(textEl);
+        typeText(textEl, getDemoResponse(text), 14);
+      }
+    });
+  })();
+
+  // ═══════════════════════════════════════════
+  // TILTING CARD — 3D mouse-follow effect
+  // ═══════════════════════════════════════════
+  (function initTiltCard() {
+    const card = document.getElementById('tilt-card');
+    if (!card) return;
+    const inner = card.querySelector('.tilt-card__inner') as HTMLElement;
+    const glow = card.querySelector('.tilt-card__glow') as HTMLElement;
+    const MAX_TILT = 8; // degrees
+
+    card.addEventListener('mousemove', (e: Event) => {
+      const me = e as MouseEvent;
+      const rect = card.getBoundingClientRect();
+      const x = me.clientX - rect.left;
+      const y = me.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateY = ((x - centerX) / centerX) * MAX_TILT;
+      const rotateX = ((centerY - y) / centerY) * MAX_TILT;
+
+      inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+      // Move glow to cursor position
+      glow.style.left = `${x}px`;
+      glow.style.top = `${y}px`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      inner.style.transform = 'rotateX(0) rotateY(0)';
+    });
+  })();
+</script>
