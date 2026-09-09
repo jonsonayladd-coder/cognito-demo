@@ -246,3 +246,90 @@ So this is a docket **log**, not verification. Record EXIF when it is present,
 never rely on it, and never let anyone describe it as proof the photo was taken
 at that time on that site. Same discipline as the GPS rule: the system records
 what it received and when it received it, and claims nothing more.
+
+---
+
+# CORRECTIONS — verified against the live Cloudflare account, 9 Sep 2026
+
+Everything above was written against v1 (`brain-worker`, D1 `brain`). **That is
+the wrong target.** The live project is **brain-v2**:
+
+- Repo: `C:\Users\me\Downloads\sitewire-mvp`
+- Worker: `sitewire-mvp` — **already deployed**, last modified 7 Sep 2026.
+  The deploy-first step above does not apply.
+- D1: `brain-v2-customer` (`b5471ff4-1b4d-482a-a91e-3ee7924bfaf9`) and
+  `brain-v2-demo` (`1a29e6ec-5986-4441-81e1-1ac90bc0f380`).
+- The old D1 `brain` (`fd8c6969…`) is v1 and is not the target.
+
+Confirm the workers.dev subdomain before pasting a webhook URL. The v1 notes say
+`allgoodnow`, which would make it `sitewire-mvp.allgoodnow.workers.dev`, but that
+is inference, not verified.
+
+## Real `messages_raw` (read from the live database, not from architecture.md)
+
+```sql
+CREATE TABLE messages_raw (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  site_id      TEXT NOT NULL,
+  gateway_id   TEXT,
+  from_phone   TEXT,
+  to_phone     TEXT,
+  body         TEXT,
+  num_media    INTEGER NOT NULL DEFAULT 0,
+  received_at  TEXT NOT NULL,
+  prev_hash    TEXT,
+  row_hash     TEXT,
+  seal_status  TEXT,
+  payload_json TEXT
+);
+CREATE UNIQUE INDEX idx_raw_dedupe ON messages_raw(site_id, gateway_id);
+```
+
+Three corrections to the adapter above:
+
+1. The column is **`gateway_id`**, not `gateway_msg_id`.
+2. Dedupe is **composite**: `ON CONFLICT(site_id, gateway_id) DO NOTHING`.
+   A bare conflict target on `gateway_id` will not compile against this index.
+3. **`site_id` is NOT NULL and must be resolved before the insert.** Texto's
+   `to` field — the number that received the message — is the routing key.
+   One number means one site. A second site needs either a second Texto number
+   or a phone→site lookup, and that decision is now load-bearing rather than
+   cosmetic. `to_phone` stores the raw value regardless.
+
+The chain lives in the row (`prev_hash`, `row_hash`, `seal_status`) and is
+enforced by `messages_raw_seal_once`. The adapter must follow exactly whatever
+the existing `/simulate` path does to compute and seal — do not hand-roll a
+second insert path. Read that handler before writing this one.
+
+## `media` — the Phase 2 section above is wrong for v2
+
+```sql
+CREATE TABLE media (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  site_id TEXT NOT NULL, raw_id INTEGER NOT NULL, idx INTEGER NOT NULL DEFAULT 0,
+  r2_key TEXT NOT NULL, content_type TEXT, bytes INTEGER,
+  sha256 TEXT NOT NULL, created_at TEXT NOT NULL
+);
+```
+
+It is `raw_id`, `content_type` and `bytes` — and **there is no `exif_json`
+column**. v2 does not store EXIF at all. Either add the column deliberately or
+drop the EXIF language from the Phase 2 plan; do not leave the doc claiming
+something the schema cannot hold.
+
+## Trigger drift between the two databases — worth a look
+
+`brain-v2-customer` has four triggers on `messages_raw`:
+`seal_once`, `no_delete`, `identity_immutable`, **`body_immutable`**.
+
+`brain-v2-demo` has only three. **It is missing `body_immutable`** — message
+bodies can be edited in the demo database but not in the customer one.
+
+If that is deliberate (so demos can be reset), fine — write it down. If it is
+drift, the demo is quietly weaker than the thing it demonstrates, which is the
+worst way for that difference to exist.
+
+## Current contents of `brain-v2-customer`
+
+9 raw messages, 3 events, 2 workers, 1 site, 0 media. Test seed, not real data —
+safe to work against.
