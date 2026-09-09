@@ -5,14 +5,15 @@ stable inbound `message_id`, AU-only routing, 3¢/SMS, $15/mo dedicated number.
 
 Belongs in `brain-worker`. Parked here because this session has no access to it.
 
-## Step 0 — the one thing that can still kill it
+## Step 0 — RESOLVED, 9 Sep 2026
 
-In the Texto dashboard, go to buy the $15/month dedicated number. If that screen
-demands an ABN, stop and fall back to Mobile Message. If it doesn't, buy it and
-continue. Everything below assumes it went through.
+Dedicated number purchased on Texto. **No ABN was required.** The blocker that
+stalled this project for three days on Twilio does not exist here, and the
+Mobile Message fallback is no longer needed.
 
-Then: Developer → Inbound Webhook. Leave the URL blank for now, but **copy the
-signing secret**.
+Remaining from this step: Developer → Inbound Webhook. Leave the URL blank until
+the Worker is deployed, but **copy the signing secret** and confirm HMAC signing
+is enabled — the signature header is only sent when it is switched on.
 
 ## Step 1 — deploy first, for once
 
