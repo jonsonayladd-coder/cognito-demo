@@ -170,3 +170,78 @@ Texto deletes message data after 90 days. D1 is the record of truth, which was
 already the design — but it means Texto can never corroborate the chain later.
 Your copy is the only copy. That is worth knowing before the word "evidence" is
 used with anyone.
+
+---
+
+# Phase 2 — photos without MMS
+
+Texto has no MMS endpoint, and MMS is the wrong tool anyway. Workers get a
+one-time upload link by SMS and the file goes straight to R2.
+
+Cost: one outbound SMS (3¢) instead of 29–34¢ inbound MMS. No second provider,
+no second account, no second adapter.
+
+## Why not MMS
+
+- **Carriers recompress MMS.** The image you receive is the carrier's re-encode,
+  usually with EXIF stripped. The SHA-256 in `media` would be a hash of the
+  carrier's version, not of what the handset produced. A direct upload gives you
+  the original bytes.
+- **Inbound MMS to virtual numbers is patchy across Australian carriers.** A
+  browser upload works on every handset.
+- **MMS needs a data connection too**, so nothing is given up on reception.
+- The premise survives: no install, no login, no account. One page, reached from
+  a text they already have.
+
+## Flow
+
+1. Worker texts `DOCKET` (or `PHOTO`, `HOLDPOINT`).
+2. Inbound webhook lands as normal — signature verified, raw row written, chained.
+3. Consumer classifies it, matches the sender against `workers`, and mints a token.
+4. Outbound SMS: `Upload here: brain.allgoodnow.workers.dev/u/x7k2m9 — expires in 15 min`
+5. Worker taps it. One `<input type="file" accept="image/*" capture="environment">`
+   and a button. Nothing else on the page.
+6. Worker streams the body to R2, hashes the bytes, writes `media` against the
+   `messages_raw` id of the text that asked — so the photo is chained to the
+   request, not floating loose.
+
+## Schema addition
+
+```
+upload_tokens   token TEXT PRIMARY KEY,        -- 128-bit random, base32
+                message_id INTEGER NOT NULL,   -- the DOCKET text that triggered it
+                worker_id INTEGER NOT NULL,
+                site_id INTEGER NOT NULL,
+                purpose TEXT NOT NULL,          -- docket | receipt | holdpoint | photo
+                created_at TEXT NOT NULL,
+                expires_at TEXT NOT NULL,
+                used_at TEXT                    -- non-null once spent
+```
+
+Rules, all enforced server-side rather than by the page:
+
+- Single use. Check `used_at IS NULL` and stamp it in the same statement that
+  accepts the upload, or two taps race and you get two files on one token.
+- Short expiry. Fifteen minutes. An unexpired token in a forwarded text is an
+  open door onto the site record.
+- The token carries the identity. Never accept a worker id, site id or purpose
+  from the page — they come from the token row only.
+- Cap the body size and check the content type on the server. `accept=` on the
+  input is a hint to the file picker, not a constraint.
+- No listing, no browsing, no index. `/u/:token` serves exactly one form and
+  accepts exactly one file.
+
+`media` already has what's needed: `r2_key`, `sha256`, `mime`, `exif_json`,
+`received_at`. Add the `upload_token` for provenance.
+
+## What this does not prove
+
+`capture="environment"` hints at the camera. It does not force it, and any
+handset can pick a photo from last week's gallery. MMS has exactly the same
+hole — nothing about a photo arriving over the carrier network proves when it
+was taken.
+
+So this is a docket **log**, not verification. Record EXIF when it is present,
+never rely on it, and never let anyone describe it as proof the photo was taken
+at that time on that site. Same discipline as the GPS rule: the system records
+what it received and when it received it, and claims nothing more.
